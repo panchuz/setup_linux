@@ -4,6 +4,7 @@
 # para automatizar la configuración inicial de lxc generado en base
 # al template debian-12-standard_12.0-1_amd64.tar.zst de Proxmox VE
 
+# el contenido de la sig variable sirve para appendear a los nombres de los archivos creados por este script
 marca="_panchuz"
 
 
@@ -24,38 +25,38 @@ function script_directorio_nombre_stdout () {
 function generacion_encabezado () {
 # GENERACIÓN DEL ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN
 
-	script_directorio_nombre="$(script_directorio_nombre_stdout)"
+###	script_directorio_nombre="$(script_directorio_nombre_stdout)"
 
 	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
 	# IFS='': Internal Field Separator, se incluye para ganarantizar que el texto sea interpretado como una única variable
 	# en lugar de un vector (por lo que entiendo)
 	IFS='' read -r -d '' encabezado <<-EOF
-	# creado por "$(script_directorio_nombre_stdout)"
-	# fecha y hora: $(date +%F_%T_TZ:%Z)
-	# nombre del host: $(hostname)
+	# creado por: /t"$(script_directorio_nombre_stdout)"
+	# fecha y hora: /t$(date +%F_%T_TZ:%Z)
+	# nombre del host: /t$(hostname)
 	# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
 	#
-	EOF
+EOF
 }
 
 function generacion_encabezado_stdout () {
 # GENERACIÓN DEL ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN
 
-	script_directorio_nombre="$(script_directorio_nombre_stdout)"
+###	script_directorio_nombre="$(script_directorio_nombre_stdout)"
 
 	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
 	# IFS='': Internal Field Separator, se incluye para ganarantizar que el texto sea interpretado como una única variable
 	# en lugar de un vector (por lo que entiendo)
-	printf "# creado por: \t\t$(script_directorio_nombre_stdout)\n"
-	printf "# fecha y hora: \t$(date +%F_%T_TZ:%Z)\n"
-	printf "# nombre del host: \t$(hostname)\n"
-	printf "# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)\n"
-	printf "#\n"
+	cat <<-EOF
+	# creado por: /t"$(script_directorio_nombre_stdout)"
+	# fecha y hora: /t$(date +%F_%T_TZ:%Z)
+	# nombre del host: /t$(hostname)
+	# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
+	#
+EOF
 }
 
-echo "$(generacion_encabezado_stdout)"
-
-funcion crear_archivo_profile_local () {
+function crear_archivo_profile_local () {
 # CONFIGURACIÓN LOCAL 
 # ref:
 
@@ -65,12 +66,18 @@ funcion crear_archivo_profile_local () {
 	# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_the_reconfiguration_of_the_locale
 
 	LANG=C.utf8
-	EOF
+EOF
 }
 
 # CONFIGURACIÓN HUSO HORARIO
 # ref
 
-funcion crear_archivo_profile_local_stdout () {
-#
+function main () {
+# FUNICIÓN PRINCIPAL
+	# COMPROBACIÓN
+	encabezado="$(generacion_encabezado_stdout)"
+	printf ${encabezado}
 }
+
+main
+printf "main se ejecutó antes de esto. bye."
