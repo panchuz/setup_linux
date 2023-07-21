@@ -76,10 +76,10 @@ function main () {
 # FUNICIÓN PRINCIPAL
 	# COMPROBACIÓN
 	local script_directorio_nombre="$(script_directorio_nombre_stdout)"
-	printf  "script_directorio_nombre:/t/s/n" "${script_directorio_nombre}"
+	printf  "script_directorio_nombre:\t%s\n" "${script_directorio_nombre}"
 	local encabezado="$(generacion_encabezado_stdout)"
-	printf  "encabezado:/t/s/n" "${encabezado}"
- 	printf "main se está ejecutando. seguimos..."
+	printf  "encabezado:\t\t%s\n" "${encabezado}"
+ 	printf "main se está ejecutando. seguimos...\n"
 }
 
 main
