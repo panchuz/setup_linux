@@ -75,7 +75,9 @@ EOF
 function main () {
 # FUNICIÓN PRINCIPAL
 	# COMPROBACIÓN
-	encabezado="$(generacion_encabezado_stdout)"
+	local script_directorio_nombre="$(script_directorio_nombre_stdout)"
+	printf ${script_directorio_nombre}
+	local encabezado="$(generacion_encabezado_stdout)"
 	printf ${encabezado}
 }
 
