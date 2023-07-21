@@ -81,10 +81,10 @@ function main () {
 	local encabezado="$(generacion_encabezado_stdout)"
 	printf  "encabezado:\t\t%s\n" "${encabezado}"
  	printf "main se está ejecutando. seguimos...\n"
-  	echo "$0" 
-     	echo "$1"
-        echo "$2"
-	echo "$3"
+  	echo "pesos 0:\t$0" 
+     	echo "pesos 1:\t$1"
+        echo "pesos 2:\t$2"
+	echo "pesos 3:\t$3"
 }
 
 main
