@@ -32,9 +32,9 @@ function generacion_encabezado () {
 	# IFS='': Internal Field Separator, se incluye para ganarantizar que el texto sea interpretado como una única variable
 	# en lugar de un vector (por lo que entiendo)
 	IFS='' read -r -d '' encabezado <<-EOF
-	# creado por: /t"$(script_directorio_nombre_stdout)"
-	# fecha y hora: /t$(date +%F_%T_TZ:%Z)
-	# nombre del host: /t$(hostname)
+	# creado por:\t"$(script_directorio_nombre_stdout)"
+	# fecha y hora:\t$(date +%F_%T_TZ:%Z)
+	# nombre del host:\t$(hostname)
 	# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
 	#
 EOF
@@ -49,9 +49,9 @@ function generacion_encabezado_stdout () {
 	# IFS='': Internal Field Separator, se incluye para ganarantizar que el texto sea interpretado como una única variable
 	# en lugar de un vector (por lo que entiendo)
 	cat <<-EOF
-	# creado por: /t"$(script_directorio_nombre_stdout)"
-	# fecha y hora: /t$(date +%F_%T_TZ:%Z)
-	# nombre del host: /t$(hostname)
+	# creado por:\t"$(script_directorio_nombre_stdout)"
+	# fecha y hora:\t$(date +%F_%T_TZ:%Z)
+	# nombre del host:\t$(hostname)
 	# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
 	#
 EOF
@@ -81,6 +81,7 @@ function main () {
 	local encabezado="$(generacion_encabezado_stdout)"
 	printf  "encabezado:\t\t%s\n" "${encabezado}"
  	printf "main se está ejecutando. seguimos...\n"
+  	echo "$0\n"
 }
 
 main
