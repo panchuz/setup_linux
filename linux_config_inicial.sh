@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#{reemplazado}!/bin/bash
 
 # creado por panchuz
 # para automatizar la configuración inicial de lxc generado en base
