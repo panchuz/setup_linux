@@ -81,10 +81,10 @@ function main () {
 	local encabezado="$(generacion_encabezado_stdout)"
 	printf  "encabezado:\t\t%s\n" "${encabezado}"
 	echo "último comando"
- 	!:p
+ 	echo $(!:p)
  	printf "main se está ejecutando. seguimos...\n"
 }
 
 main
-!:p
+echo $(!:p)
 printf "main se ejecutó antes de esto. bye."
