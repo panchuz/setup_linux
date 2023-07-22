@@ -80,12 +80,11 @@ function main () {
 	printf  "script_directorio_nombre:\t%s\n" "${script_directorio_nombre}"
 	local encabezado="$(generacion_encabezado_stdout)"
 	printf  "encabezado:\t\t%s\n" "${encabezado}"
+	echo "último comando"
+ 	!:p
  	printf "main se está ejecutando. seguimos...\n"
-  	echo "pesos 0:\t$0" 
-     	echo "pesos 1:\t$1"
-        echo "pesos 2:\t$2"
-	echo "pesos 3:\t$3"
 }
 
 main
+!:p
 printf "main se ejecutó antes de esto. bye."
