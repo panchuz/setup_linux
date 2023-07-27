@@ -79,7 +79,8 @@ function main () {
 	local script_directorio_nombre="$(script_directorio_nombre_stdout)"
 	printf  "script_directorio_nombre:\t%s\n" "${script_directorio_nombre}"
 	local encabezado="$(generacion_encabezado_stdout)"
-	IFS='' printf  "encabezado:\t\t\n%s\n" ${encabezado}
+	printf  "encabezado:\n"
+ 	printf "${encabezado}"
 }
 
 main
