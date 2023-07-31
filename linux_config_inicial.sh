@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #{reemplazado}!/bin/bash
+source <(curl -s https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 # creado por panchuz
 # para automatizar la configuración inicial de lxc generado en base
@@ -8,20 +9,6 @@
 # el contenido de la sig variable sirve para appendear a los nombres de los archivos creados por este script
 marca="_panchuz"
 
-
-function script_directorio_nombre_stdout () {
-	# determinación del directorio de este script para que conste en el encabezado
-	# https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
-	local source=${BASH_SOURCE[0]}
-	while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
-	  local directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
-	  source=$(readlink "$source")
-	  [[ $source != /* ]] && source=$directorio/$source # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-	done
-	directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
-	local nombre=$(basename "$source")
-	printf "${directorio}/${nombre}"
-}
 
 function generacion_encabezado () {
 # GENERACIÓN DEL ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN
