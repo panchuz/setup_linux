@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #{reemplazado}!/bin/bash
-source <(curl -s https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
+source <(wget -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 # creado por panchuz
 # para automatizar la configuración inicial de lxc generado en base
