@@ -30,7 +30,7 @@ function crear_archivo_profile_local () {
 	cat >/etc/profile.d/profile${marca}.sh <<-EOF
 	${encabezado}
 	# https://wiki.debian.org/Locale#Standard
-	# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_the_reconfiguration_of_the_locale
+	# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_rationale_for_utf_8_locale
 
 	LANG=C.utf8
 EOF
