@@ -6,8 +6,12 @@
 # para automatizar la configuración inicial de lxc generado en base
 # al template debian-12-standard_12.0-1_amd64.tar.zst de Proxmox VE
 
+# Opciones para la configuración
+export LANG=C.utf8 # quedará de forma permamente. Ver: function crear_archivo_profile_local ()
+HUSO_HORARIO=America/Argentina/Buenos_Aires
+
 # el contenido de la sig variable sirve para appendear a los nombres de los archivos creados por este script
-marca="_panchuz"
+MARCA="_panchuz"
 
 
 # GENERACIÓN DEL ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN
@@ -27,26 +31,26 @@ EOF
 
 # CONFIGURACIÓN LOCAL
 function crear_archivo_profile_local () {
-	cat >/etc/profile.d/profile${marca}.sh <<-EOF
+	cat >/etc/profile.d/profile${MARCA}.sh <<-EOF
 	${encabezado}
 	# https://wiki.debian.org/Locale#Standard
 	# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_rationale_for_utf_8_locale
 
-	LANG=C.utf8
+	LANG=${LANG}
 EOF
 }
 
 # CONFIGURACIÓN HUSO HORARIO
 function cambiar_huso_horario () {
 	# https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/
-	timedatectl set-timezone America/Argentina/Buenos_Aires
+	timedatectl set-timezone $HUSO_HORARIO
 }
 
 #------------------FUNCIÓN PRINCIPAL------------------
 function main () {
 # FUNICIÓN PRINCIPAL
-	# para comprobar
 	local encabezado="$(generacion_encabezado_stdout)"
+	# para comprobar
 	printf  "encabezado:\n"
  	printf "${encabezado}"
 	crear_archivo_profile_local
@@ -55,4 +59,4 @@ function main () {
 }
 
 main
-printf "con esto termina el script\nbye."
+printf "con esto termina el script\nbye\N"
