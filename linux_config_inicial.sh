@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #{reemplazado}!/bin/bash
-# source <(wget -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
+source <(wget -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 # creado por panchuz
 # para automatizar la configuración inicial de lxc generado en base
@@ -43,7 +43,7 @@ EOF
 # CONFIGURACIÓN HUSO HORARIO
 function cambiar_huso_horario () {
 	# https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/
-	timedatectl set-timezone $HUSO_HORARIO
+	timedatectl set-timezone ${HUSO_HORARIO}
 }
 
 #------------------FUNCIÓN PRINCIPAL------------------
@@ -51,12 +51,16 @@ function main () {
 # FUNICIÓN PRINCIPAL
 	local encabezado="$(generacion_encabezado_stdout)"
 	# para comprobar
-	printf  "encabezado:\n"
+	printf  "Encabezado de todos los archivos generados:\n"
  	printf "${encabezado}"
 	crear_archivo_profile_local
 	cambiar_huso_horario
-
+	nuevo_debian_dist-upgrade
+ 	# verificación
+	printf "/var/run/reboot-required= "
+	cat /var/run/reboot-required
+	printf "\n"
 }
 
 main
-printf "con esto termina el script\nbye\N"
+printf "con esto termina el script\nbye\n"
