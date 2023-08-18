@@ -50,7 +50,8 @@ function debian_dist-upgrade_reboot () {
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 function verif_privilegios_root () {
 	if (( $EUID != 0 )); then
-		printf "ERROR: Este script se debe ejecutar con privilegios root\n"
+		printf "ERROR: Este script se debe ejecutar con privilegios root (printf)\n"
+		echo "ERROR: Este script se debe ejecutar con privilegios root (echo)\n"
 		return 1
 	fi
 }
