@@ -51,7 +51,7 @@ function debian_dist-upgrade_reboot () {
 function verif_privilegios_root () {
 	if (( $EUID != 0 )); then
 		printf "ERROR: Este script se debe ejecutar con privilegios root\n"
-		return
+		return 1
 	fi
 }
 
