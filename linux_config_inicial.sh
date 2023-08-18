@@ -46,13 +46,15 @@ function cambiar_huso_horario () {
 #------------------FUNCIÓN PRINCIPAL------------------
 function main () {
 # FUNICIÓN PRINCIPAL
+	# me aseguro que sea root o salgo con mensaje de error
+	verif_privilegios_root
 	local encabezado="$(generacion_encabezado_stdout)"
 	# para comprobar
 	printf  "Encabezado de todos los archivos generados:\n"
  	printf "${encabezado}"
 	crear_archivo_profile_local
 	cambiar_huso_horario
-	#nuevo_debian_dist-upgrade
+	nuevo_debian_dist-upgrade
  	# verificación
 	printf "/var/run/reboot-required= "
 	cat /var/run/reboot-required
