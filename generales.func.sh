@@ -52,7 +52,7 @@ function verif_privilegios_root () {
 	if (( $EUID != 0 )); then
 		printf "ERROR: Este script se debe ejecutar con privilegios root (printf)\n"
 		echo "ERROR: Este script se debe ejecutar con privilegios root (echo)\n"
-		return 1
+		exit 1
 	fi
 }
 
