@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # FUNCIONES GENERALES para bash scripts
 
 # Determinación robusta* del directorio de este script para que conste en el encabezado
