@@ -18,7 +18,7 @@ function script_directorio_nombre_stdout () {
 
 # apt-get update and upgrade automate and unattended
 # https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
-function nuevo_debian_dist-upgrade () {
+function debian_dist-upgrade_confnew () {
 	# local NEEDRESTART_MODE=a
 	local DEBIAN_FRONTEND=noninteractive
 	## Questions that you really, really need to see (or else). ##
@@ -29,22 +29,6 @@ function nuevo_debian_dist-upgrade () {
 	apt-get -qq autoremove
 }
 
-
-# apt-get update and upgrade automate and unattended
-# https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
-function debian_dist-upgrade_reboot () {
-	# local NEEDRESTART_MODE=a
-	local DEBIAN_FRONTEND=noninteractive
-	## Questions that you really, really need to see (or else). ##
-	local DEBIAN_PRIORITY=critical
-	apt-get -qq update
-	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" dist-upgrade
-	apt-get -qq clean
-	apt-get -qq autoremove
-	if [ -f /var/run/reboot-required ]; then
-		reboot
-	fi
-}
 
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
