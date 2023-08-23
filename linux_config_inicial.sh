@@ -38,39 +38,44 @@ EOF
 }
 
 # CONFIGURACIÓN HUSO HORARIO
-function cambiar_huso_horario () {
+function config_huso_horario () {
 	# https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/
 	timedatectl set-timezone ${TZ}
 }
 
 #------------------FUNCIÓN PRINCIPAL------------------
-function main () {
-# FUNICIÓN PRINCIPAL
-	# me aseguro que sea root o salgo con mensaje de error
-	verif_privilegios_root
-	local encabezado="$(generacion_encabezado_stdout)"
-	# para comprobar
-	printf  "Encabezado de todos los archivos generados:\n"
- 	printf "${encabezado}"
-	crear_archivo_profile_local
-	cambiar_huso_horario
-	nuevo_debian_dist-upgrade
- 	# verificación
-  	ls -la /var/run/
-	printf "/var/run/reboot-required= "
-	cat /var/run/reboot-required
-	printf "\n"
+function principal () {
+ 	
+  	# script para seguir el proceso luego del reboot (o del no reboot)
+	local script_despues=linux_config_inicial_despues.sh
+	wget -qP /root https://github.com/panchuz/linux_config_inicial/raw/main/${script_despues} &&
+ 		chmod +x /root/${script_despues}
+   
+        # genera y guarda encabezado de texto para uso posterior en archivos creados por el script
+ 	local encabezado="$(generacion_encabezado_stdout)"
+  
+  	# genera locale $LANG permanente
+	crear_archivo_profile_locale
+ 
+ 	# Setea huso horario
+	config_huso_horario
+ 
+ 	# Actualización desatendida "confnew", OJO!
+	debian_dist-upgrade_confnew
+
+ 	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
 		printf "Se necesita rebootear\n"
-	else
+ 	else
  		printf "NO se necesita rebootar\n"
- 	fi
+   		/root/${script_despues}
+  	fi
 }
 
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( $EUID == 0 )); then
-	main
+	principal
 else
 	printf "ERROR: Este script se debe ejecutar con privilegios root\n"
 fi
