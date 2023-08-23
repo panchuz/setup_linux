@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # FUNCIONES GENERALES para bash scripts
 
