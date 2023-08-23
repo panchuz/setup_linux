@@ -23,10 +23,10 @@ function nuevo_debian_dist-upgrade () {
 	local DEBIAN_FRONTEND=noninteractive
 	## Questions that you really, really need to see (or else). ##
 	local DEBIAN_PRIORITY=critical
-	apt-get -qy update
-	apt-get -qy -o "Dpkg::Options::=--force-confnew" dist-upgrade
-	apt-get -qy clean
-	apt-get -qy autoremove
+	apt-get -qq update
+	apt-get -qq -o "Dpkg::Options::=--force-confnew" dist-upgrade
+	apt-get -qq clean
+	apt-get -qq autoremove
 }
 
 
@@ -37,10 +37,10 @@ function debian_dist-upgrade_reboot () {
 	local DEBIAN_FRONTEND=noninteractive
 	## Questions that you really, really need to see (or else). ##
 	local DEBIAN_PRIORITY=critical
-	apt-get -qy update
-	apt-get -qy -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" dist-upgrade
-	apt-get -qy clean
-	apt-get -qy autoremove
+	apt-get -qq update
+	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" dist-upgrade
+	apt-get -qq clean
+	apt-get -qq autoremove
 	if [ -f /var/run/reboot-required ]; then
 		reboot
 	fi
@@ -51,8 +51,9 @@ function debian_dist-upgrade_reboot () {
 function verif_privilegios_root () {
 	if (( $EUID != 0 )); then
 		printf "ERROR: Este script se debe ejecutar con privilegios root (printf)\n"
-		echo "ERROR: Este script se debe ejecutar con privilegios root (echo)\n"
-		exit 1
+		return 1
+  	else
+   		return 0
 	fi
 }
 
