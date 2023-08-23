@@ -14,3 +14,7 @@ chmod +x /root/linux_config_inicial.sh
 ## Comando para bajar el .sh y ejecutarlo como "source"
 wget -qP /root https://github.com/panchuz/linux_config_inicial/raw/main/linux_config_inicial.sh &&
 source /root/linux_config_inicial.sh
+
+## Cargar funciones generales.func.sh
+### https://github.com/panchuz/linux_config_inicial/raw/main/
+bash -c "$(wget -qLO - https://github.com/panchuz/linux_config_inicial/raw/main/generales.func.sh)" 
