@@ -56,10 +56,17 @@ function main () {
 	cambiar_huso_horario
 	nuevo_debian_dist-upgrade
  	# verificación
+  	ls -la /var/run/
 	printf "/var/run/reboot-required= "
 	cat /var/run/reboot-required
 	printf "\n"
 }
 
-main
+# Verificación de privilegios
+# https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
+if (( $EUID = 0 )); then
+	main
+else
+	printf "ERROR: Este script se debe ejecutar con privilegios root\n"
+fi
 printf "con esto termina el script\nbye\n"
