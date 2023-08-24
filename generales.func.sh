@@ -27,9 +27,9 @@ function debian_dist-upgrade () {
 	## Questions that you really, really need to see (or else). ##
 	export DEBIAN_PRIORITY=critical
 	apt-get -qq update
-	#apt-get -qq -o "Dpkg::Options::=--force-confnew" dist-upgrade
-	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 upgrade
-	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 dist-upgrade
+	#apt-get -qq -o "Dpkg::Options::=--force-confnew" -o=Dpkg::Use-Pty=0 dist-upgrade
+	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" upgrade > /dev/null
+	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" dist-upgrade > /dev/null
  	apt-get -qq clean
  	apt-get -qq autoclean
   	apt-get -qq autoremove
