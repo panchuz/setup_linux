@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
+#source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 # creado por panchuz
 # para automatizar la segunda parte de la configuración inicial de lxc generado en base
@@ -9,7 +9,7 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_confi
 #------------------FUNCIÓN PRINCIPAL------------------
 function principal () {
 	# aca va el comentario
-	printf  "linux_config_inicial_despues.sh se está ejecutando:\n"
+	printf  "%s se está ejecutando:\n" ${BASH_SOURCE}
 }
 
 principal
