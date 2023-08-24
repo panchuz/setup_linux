@@ -18,14 +18,15 @@ function script_directorio_nombre_stdout () {
 
 # apt-get update and upgrade automate and unattended
 # https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
-function debian_dist-upgrade_confnew () {
-	# local NEEDRESTART_MODE=a
-	local DEBIAN_FRONTEND=noninteractive
+function debian_dist-upgrade () {
+	# export NEEDRESTART_MODE=a
+	export DEBIAN_FRONTEND=noninteractive
 	## Questions that you really, really need to see (or else). ##
-	local DEBIAN_PRIORITY=critical
+	export DEBIAN_PRIORITY=critical
 	apt-get -qq update
-	apt-get -qq -o "Dpkg::Options::=--force-confnew" dist-upgrade
-	apt-get -qq clean
+	#apt-get -qq -o "Dpkg::Options::=--force-confnew" dist-upgrade
+	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" upgrade
+ 	apt-get -qq clean
 	apt-get -qq autoremove
 }
 
