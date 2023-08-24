@@ -27,7 +27,7 @@ EOF
 }
 
 # CONFIGURACIÓN LOCAL
-function crear_archivo_profile_local () {
+function crear_archivo_profile_locale () {
 	cat >/etc/profile.d/profile${MARCA}.sh <<-EOF
 	${encabezado}
 	# https://wiki.debian.org/Locale#Standard
