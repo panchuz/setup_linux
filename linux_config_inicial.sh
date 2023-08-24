@@ -49,7 +49,7 @@ function config_huso_horario () {
 
 # SERVICIO PARA EL REINICIO
 # https://wiki.debian.org/systemd#Creating_or_altering_services
-function crear_archivo_reinicio-servicio () {
+function crear_archivo_reinicio-service () {
 	cat >/etc/systemd/system/reinicio${MARCA}.service <<-EOF
 	${encabezado}
 	# https://wiki.debian.org/systemd#Creating_or_altering_services
@@ -60,11 +60,11 @@ function crear_archivo_reinicio-servicio () {
 	After=network.target auditd.service
 	ConditionFileIsExecutable=/root/${script_reinicio}
 
- 	[Service]
- 	Type=oneshot
+	[Service]
+	Type=oneshot
 	ExecStart=/bin/bash /root/${script_reinicio}
- 	# desactiva el servicio luego que cumplió su función:
- 	ExecStartPost=/bin/systemctl disable reinicio${MARCA}
+	# desactiva el servicio luego que cumplió su función:
+	ExecStartPost=/bin/systemctl disable reinicio${MARCA}
 
 	[Install]
 	WantedBy=multi-user.target
@@ -93,9 +93,12 @@ function principal () {
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
-		printf "Se necesita rebootear\n"
+		crear_archivo_reinicio-service
+  		printf "Se procede a reiniciar\n"
+    		/bin/sleep 3
+      		reboot
  	else
- 		printf "NO se necesita rebootar\n"
+ 		printf "NO se necesita reiniciar\n"
    		/root/${script_reinicio}
   	fi
 }
