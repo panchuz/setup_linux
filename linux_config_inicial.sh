@@ -61,7 +61,7 @@ function principal () {
 	config_huso_horario
  
  	# Actualización desatendida "confnew", OJO!
-	debian_dist-upgrade_confnew
+	debian_dist-upgrade
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
