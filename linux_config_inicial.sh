@@ -50,7 +50,7 @@ function config_huso_horario () {
 # SERVICIO PARA EL REINICIO
 # https://wiki.debian.org/systemd#Creating_or_altering_services
 function crear_archivo_reinicio-servicio () {
-	cat >/etc/systemd/system/reinicio${MARCA}.servicio <<-EOF
+	cat >/etc/systemd/system/reinicio${MARCA}.service <<-EOF
 	${encabezado}
 	# https://wiki.debian.org/systemd#Creating_or_altering_services
 	# https://operavps.com/docs/run-command-after-boot-in-linux/
