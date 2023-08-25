@@ -19,9 +19,9 @@ MARCA="_panchuz"
 function generacion_encabezado_stdout () {
 	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
 	cat <<-EOF
-	# creado por (BASH_SOURCE):\t${BASH_SOURCE}
-	# fecha y hora:\t$(date +%F_%T_TZ:%Z)
-	# nombre del host:\t$(hostname)
+	# creado por (BASH_SOURCE):	${BASH_SOURCE}
+	# fecha y hora:	$(date +%F_%T_TZ:%Z)
+	# nombre host:	$(hostname)
 	# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
 	#
 	
@@ -47,39 +47,55 @@ function config_huso_horario () {
 
 
 
-# SERVICIO PARA EL REINICIO
+# CREA UN SERVICE PARA CONTINUAR LUEGO DEL REINICIO
 # https://wiki.debian.org/systemd#Creating_or_altering_services
-function crear_archivo_reinicio-service () {
-	cat >/etc/systemd/system/reinicio${MARCA}.service <<-EOF
+# $1: El service creado ejecuta $1 luego del reinicio
+function crear_reinicio-service () {
+	local path_script_reinicio="$1"
+ 	
+  	local nombre_reinicio_service=reinicio${MARCA}.service
+ 	local path_nombre_reinicio_service=/etc/systemd/system/${nombre_reinicio_service}
+  
+ 	cat >${path_nombre_reinicio_service} <<-EOF
 	${encabezado}
 	# https://wiki.debian.org/systemd#Creating_or_altering_services
 	# https://operavps.com/docs/run-command-after-boot-in-linux/
  
 	[Unit]
-	Description=Ejecuta /root/${script_reinicio} por única vez luego de reinicio
+	Description=Ejecuta ${path_script_reinicio} por única vez luego de reinicio
 	After=network.target auditd.service
-	ConditionFileIsExecutable=/root/${script_reinicio}
+	ConditionFileIsExecutable=${path_script_reinicio}
 
 	[Service]
 	Type=oneshot
-	ExecStart=/bin/bash /root/${script_reinicio}
+	ExecStart=/bin/bash ${path_script_reinicio}
 	# desactiva el servicio luego que cumplió su función:
-	ExecStartPost=/bin/systemctl disable reinicio${MARCA}
+	ExecStartPost=/bin/systemctl disable ${nombre_reinicio_service} 
 
 	[Install]
 	WantedBy=multi-user.target
 EOF
+	systemctl enable ${nombre_reinicio_service}
 }
 
 #------------------FUNCIÓN PRINCIPAL------------------
 function principal () {
  	
   	# script para seguir el proceso luego del reboot (o del no reboot)
-	export script_reinicio=linux_config_inicial_reinicio.sh
-	wget -qP /root https://github.com/panchuz/linux_config_inicial/raw/main/${script_reinicio} &&
- 		chmod +x /root/${script_reinicio}
-   
-        # genera y guarda encabezado de texto para uso posterior en archivos creados por el script
+   	# debe coincidir con el de https://github.com/panchuz/linux_config_inicial/raw/main/....sh
+	local script_reinicio=linux_config_inicial_reinicio.sh
+ 	local path_script_reinicio=/root/${script_reinicio}
+  
+	#wget -qP /root https://github.com/panchuz/linux_config_inicial/raw/main/${script_reinicio} &&
+	wget -qO ${path_script_reinicio} https://github.com/panchuz/linux_config_inicial/raw/main/${script_reinicio}
+	if [ $? -eq 0 ]; then
+		chmod +x ${path_script_reinicio}
+	else
+		printf "ABORTANDO: No se pudo descargar ${script_reinicio}\n"
+   		return 1
+	fi
+    
+	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
  	local encabezado="$(generacion_encabezado_stdout)"
   
   	# genera locale $LANG permanente
@@ -93,13 +109,13 @@ function principal () {
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
-		crear_archivo_reinicio-service
+		crear_reinicio-service "$path_script_reinicio"
   		printf "Se procede a reiniciar\n"
-    		/bin/sleep 3
-      		reboot
+		/bin/sleep 5
+		reboot
  	else
  		printf "NO se necesita reiniciar\n"
-   		/root/${script_reinicio}
+   		${path_script_reinicio}
   	fi
 }
 
