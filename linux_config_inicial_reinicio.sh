@@ -9,7 +9,9 @@
 #------------------FUNCIÓN PRINCIPAL------------------
 function principal () {
 	# aca va el comentario
-	printf  "%s se está ejecutando:\n" ${BASH_SOURCE}
+ 	now=$(date)
+	printf "Current date and time in Linux %s\n" "$now" > /root/prueba_reinicio.txt
+	printf  "%s se está ejecutando:\n" ${BASH_SOURCE} >> /root/prueba_reinicio.txt
 }
 
 principal
