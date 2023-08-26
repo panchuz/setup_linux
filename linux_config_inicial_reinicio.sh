@@ -12,6 +12,13 @@ function principal () {
  	now=$(date)
 	printf "Current date and time in Linux %s\n" "$now" > /root/prueba_reinicio.txt
 	printf  "%s se está ejecutando:\n" ${BASH_SOURCE} >> /root/prueba_reinicio.txt
+	# unattended-upgrades
+	# postfix
+	# crear panchuz
+	# instalar sudo
+	# usermod -aG sudo,systemd-journal,adm panchuz
+	# setcap cap_net_raw+p $(which ping) # http://unixetc.co.uk/2016/05/30/linux-capabilities-and-ping/
+	# ssh / public key para panchuz
 }
 
 principal
