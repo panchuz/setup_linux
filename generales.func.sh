@@ -21,15 +21,15 @@ function script_directorio_nombre_stdout () {
 # https://devicetests.com/silence-apt-get-install-output
 # https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
 function debian_dist-upgrade () {
-	# sin rebooteo automático:
-	# export NEEDRESTART_MODE=a
+	# se comentó la sig línea para evitar el reinicio automático
+	#export NEEDRESTART_MODE=a
 	export DEBIAN_FRONTEND=noninteractive
-	## Questions that you really, really need to see (or else). ##
+	# Questions that you really, really need to see (or else). ##
 	export DEBIAN_PRIORITY=critical
 	apt-get -qq update
 	#apt-get -qq -o "Dpkg::Options::=--force-confnew" -o=Dpkg::Use-Pty=0 dist-upgrade
-	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" upgrade > /dev/null
-	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" dist-upgrade > /dev/null
+	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 upgrade
+	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 dist-upgrade
  	apt-get -qq clean
  	apt-get -qq autoclean
   	apt-get -qq autoremove
