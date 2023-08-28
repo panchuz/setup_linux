@@ -43,7 +43,7 @@ function debian_dist-upgrade_install () {
 	fi
  	apt-get -q clean
  	apt-get -q autoclean
-  	apt-get -q autoremove
+  	apt-get -qq autoremove
    	printf "escribiendo a disco... "
 	sync && printf "Éxito\n"
 }
