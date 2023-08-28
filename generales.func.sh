@@ -32,7 +32,7 @@ function debian_dist-upgrade_install () {
 	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 upgrade
 	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 dist-upgrade
 	if [ $# -gt 0 ]; then
- 		apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o "Dpkg::Use-Pty=0" install "$@"
+ 		apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 install "$@"
 	fi
  	apt-get -qq clean
  	apt-get -qq autoclean
