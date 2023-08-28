@@ -27,7 +27,7 @@ function debian_dist-upgrade_install () {
 	export DEBIAN_FRONTEND=noninteractive
 	# Questions that you really, really need to see (or else). ##
 	export DEBIAN_PRIORITY=critical
-	apt-get -q update
+	apt-get -qq update
 	#apt-get -qq -o "Dpkg::Options::=--force-confnew" -o=Dpkg::Use-Pty=0 dist-upgrade
 	#apt-get -o=Dpkg::Use-Pty=0 no parece funcionar, genera output igual
 	printf "ejecutando apt-get upgrade... "
@@ -41,9 +41,10 @@ function debian_dist-upgrade_install () {
    		apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
 			install "$@" >/dev/null && printf "Éxito\n"
 	fi
- 	apt-get -q clean
- 	apt-get -q autoclean
-  	apt-get -qq autoremove
+ 	printf "limpiando... "
+	apt-get -qq clean
+ 	apt-get -qq autoclean
+  	apt-get -qq autoremove && printf "Éxito\n"
    	printf "escribiendo a disco... "
 	sync && printf "Éxito\n"
 }
