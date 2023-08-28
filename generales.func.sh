@@ -20,7 +20,8 @@ function script_directorio_nombre_stdout () {
 # https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
 # https://devicetests.com/silence-apt-get-install-output
 # https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
-function debian_dist-upgrade () {
+function debian_dist-upgrade_install () {
+	## argumentos: paquetes a instalar luego del dist-upgrade
 	# se comentó la sig línea para evitar el reinicio automático
 	#export NEEDRESTART_MODE=a
 	export DEBIAN_FRONTEND=noninteractive
@@ -30,6 +31,9 @@ function debian_dist-upgrade () {
 	#apt-get -qq -o "Dpkg::Options::=--force-confnew" -o=Dpkg::Use-Pty=0 dist-upgrade
 	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 upgrade
 	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 dist-upgrade
+	if [ $# -gt 0 ]; then
+ 		apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 install "$*"
+	fi
  	apt-get -qq clean
  	apt-get -qq autoclean
   	apt-get -qq autoremove
