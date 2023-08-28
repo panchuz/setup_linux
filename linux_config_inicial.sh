@@ -45,21 +45,26 @@ function config_huso_horario () {
 	timedatectl set-timezone ${TZ}
 }
 
+	# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#null_client
+	# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#fantasy
+	# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
+	# https://forum.proxmox.com/threads/get-postfix-to-send-notifications-email-externally.59940/
+	# https://serverfault.com/questions/744761/postfix-aliases-will-be-ignored
 
 # --- CONFIGURACIÓN unattended-upgrades PARA PRUEBA MAIL ---
-# https://stackoverflow.com/questions/525592/find-and-replace-inside-a-text-file-from-a-bash-command
+# ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
 function config_unattended-upgrades_prueba_mail () {
-	cat /etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
+	cat >/etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
 	${encabezado//\#///}
-	# https://wiki.debian.org/Locale#Standard
-	# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_rationale_for_utf_8_locale
-
+	// https://wiki.debian.org/UnattendedUpgrades#Unattended_Upgrades
+	// 
+	
 	Unattended-Upgrade::Mail "root";
 EOF
 }
 
 
-# --- CREA UN SERVICE PARA CONTINUAR LUEGO DEL REINICIO ---
+# --- CREA UN service PARA CONTINUAR LUEGO DEL REINICIO ---
 # https://wiki.debian.org/systemd#Creating_or_altering_services
 # $1: El service creado ejecuta $1 luego del reinicio
 function crear_reinicio-service () {
