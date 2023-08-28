@@ -46,8 +46,20 @@ function config_huso_horario () {
 }
 
 
+# --- CONFIGURACIÓN unattended-upgrades PARA PRUEBA MAIL ---
+# https://stackoverflow.com/questions/525592/find-and-replace-inside-a-text-file-from-a-bash-command
+function config_unattended-upgrades_prueba_mail () {
+	cat /etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
+	${encabezado//\#///}
+	# https://wiki.debian.org/Locale#Standard
+	# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_rationale_for_utf_8_locale
 
-# CREA UN SERVICE PARA CONTINUAR LUEGO DEL REINICIO
+	Unattended-Upgrade::Mail "root";
+EOF
+}
+
+
+# --- CREA UN SERVICE PARA CONTINUAR LUEGO DEL REINICIO ---
 # https://wiki.debian.org/systemd#Creating_or_altering_services
 # $1: El service creado ejecuta $1 luego del reinicio
 function crear_reinicio-service () {
@@ -104,9 +116,28 @@ function principal () {
  	# Setea huso horario
 	config_huso_horario
  
- 	# Actualización desatendida "confnew", OJO!
-	debian_dist-upgrade_install unattended-upgrades apt-listchanges sudo libsasl2-modules postfix-pcre
-	# bsd-mailx???? o es solo necesario para probar usando mailx...???
+ 	# Actualización desatendida "confdef/confold"
+	# mailx es pedido en /etc/apt/apt.conf.d/50unattended-upgrades para notificar por mail
+	# apt-listchanges es indicado en https://wiki.debian.org/UnattendedUpgrades#Automatic_call_via_.2Fetc.2Fapt.2Fapt.conf.d.2F20auto-upgrades
+	debian_dist-upgrade_install libsasl2-modules postfix-pcre bsd-mailx apt-listchanges unattended-upgrades sudo
+
+
+	# configurar postfix:
+	# mv /etc/postfix/mail.cf /etc/postfix/mail.cf.ORIGINAL${MARCA}
+	# configuración postfix >> /etc/postfix/mail.cf
+	# postfix reload
+ 
+ 	# configurar uanttended-upgrades
+	# escribir $(encabezado) Unattended-Upgrade::Mail "root"; > 51unattended-upgrades${MARCA}
+	config_unattended-upgrades_prueba_mail
+
+	# mail de prueba: unattended-upgrade -d
+	# escribir Unattended-Upgrade::MailReport "only-on-error"; >> 51unattended-upgrades${MARCA}
+
+	# panchuz = 1000
+	# groups
+	# set-cap
+	# journal
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
