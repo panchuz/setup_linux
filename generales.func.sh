@@ -27,17 +27,25 @@ function debian_dist-upgrade_install () {
 	export DEBIAN_FRONTEND=noninteractive
 	# Questions that you really, really need to see (or else). ##
 	export DEBIAN_PRIORITY=critical
-	apt-get -qq update
+	apt-get -q update
 	#apt-get -qq -o "Dpkg::Options::=--force-confnew" -o=Dpkg::Use-Pty=0 dist-upgrade
-	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 upgrade
-	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 dist-upgrade
+	#apt-get -o=Dpkg::Use-Pty=0 no parece funcionar, genera output igual
+	printf "ejecutando apt-get upgrade... "
+	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
+		upgrade >/dev/null && printf "Éxito\n"
+	printf "ejecutando apt-get dist-upgrade... "
+	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
+		dist-upgrade >/dev/null && printf "Éxito\n"
 	if [ $# -gt 0 ]; then
- 		apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" -o=Dpkg::Use-Pty=0 install "$@"
+ 		printf "ejecutando apt-get install $*... "
+   		apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
+			install "$@" >/dev/null && printf "Éxito\n"
 	fi
- 	apt-get -qq clean
- 	apt-get -qq autoclean
-  	apt-get -qq autoremove
-   	sync
+ 	apt-get -q clean
+ 	apt-get -q autoclean
+  	apt-get -q autoremove
+   	printf "escribiendo a disco... "
+	sync && printf "Éxito\n"
 }
 
 
