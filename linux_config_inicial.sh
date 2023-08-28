@@ -105,7 +105,8 @@ function principal () {
 	config_huso_horario
  
  	# Actualización desatendida "confnew", OJO!
-	debian_dist-upgrade
+	debian_dist-upgrade_install unattended-upgrades apt-listchanges sudo libsasl2-modules postfix-pcre
+	# bsd-mailx???? o es solo necesario para probar usando mailx...???
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
