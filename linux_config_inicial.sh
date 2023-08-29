@@ -51,16 +51,17 @@ config_huso_horario () {
 # https://forum.proxmox.com/threads/get-postfix-to-send-notifications-email-externally.59940/
 # https://serverfault.com/questions/744761/postfix-aliases-will-be-ignored
 config_postfix_nullclient_gmail () {
-	cp /etc/postfix/mail.cf /etc/postfix/mail.cf.ORIGINAL${MARCA}
-	# configuración postfix >> /etc/postfix/mail.cf
-	postconf 'relayhost = [smtp.gmail.com]:587' \
-			'mydestination =' \
+	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL${MARCA}
+	# configuración postfix >> /etc/postfix/main.cf
+	postconf 'relayhost = 'mydestination =' \
+			[smtp.gmail.com]:587' \
 			'inet_interfaces = loopback-only' \
-			'smtp_sasl_auth_enable = yes' \
+			#####'compatibility_level = 3.6' \
 			'smtp_sasl_security_options = noanonymous' \
-			'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
 			'smtp_tls_security_level = encrypt' \
-			'smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt'
+			'smtp_sasl_auth_enable = yes' \
+			'smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt' \
+			'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd'
 	cat >/etc/postfix/sasl/sasl_passwd <<-EOF
 		${encabezado}
 		# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
