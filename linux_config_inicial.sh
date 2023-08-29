@@ -6,7 +6,7 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_confi
 # al template debian-12-standard_12.0-1_amd64.tar.zst de Proxmox VE
 
 # Opciones para la configuración
-export LANG=C.utf8 # quedará de forma permamente. Ver: function crear_archivo_profile_local ()
+export LANG=C.utf8 # quedará de forma permamente. Ver: crear_archivo_profile_local ()
 export TZ='America/Argentina/Buenos_Aires'
 
 # el contenido de la sig variable sirve para appendear a los nombres de los archivos creados por este script
@@ -16,7 +16,7 @@ MARCA="_panchuz"
 
 
 # GENERACIÓN DEL ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN
-function generacion_encabezado_stdout () {
+generacion_encabezado_stdout () {
 	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
 	cat <<-EOF
 	# creado por (BASH_SOURCE):	${BASH_SOURCE}
@@ -29,7 +29,7 @@ EOF
 }
 
 # CONFIGURACIÓN LOCAL
-function crear_archivo_profile_locale () {
+crear_archivo_profile_locale () {
 	cat >/etc/profile.d/profile${MARCA}.sh <<-EOF
 	${encabezado}
 	# https://wiki.debian.org/Locale#Standard
@@ -40,20 +40,37 @@ EOF
 }
 
 # CONFIGURACIÓN HUSO HORARIO
-function config_huso_horario () {
-	# https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/
+# https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/
+config_huso_horario () {
 	timedatectl set-timezone ${TZ}
 }
 
-	# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#null_client
-	# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#fantasy
-	# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
-	# https://forum.proxmox.com/threads/get-postfix-to-send-notifications-email-externally.59940/
-	# https://serverfault.com/questions/744761/postfix-aliases-will-be-ignored
+# --- CONFIGURACIÓN postfix ---
+# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#null_client	y ...#fantasy
+# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
+# https://forum.proxmox.com/threads/get-postfix-to-send-notifications-email-externally.59940/
+# https://serverfault.com/questions/744761/postfix-aliases-will-be-ignored
+config_postfix_nullclient_gmail () {
+	cp /etc/postfix/mail.cf /etc/postfix/mail.cf.ORIGINAL${MARCA}
+	# configuración postfix >> /etc/postfix/mail.cf
+	postconf 'relayhost = [smtp.gmail.com]:587' \
+		'mydestination =' \
+		'inet_interfaces = loopback-only' \
+		'smtp_sasl_auth_enable = yes' \
+		'smtp_sasl_security_options = noanonymous' \
+		'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
+		'smtp_tls_security_level = encrypt' \
+		'smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt'
+	#wget /etc/postfix/sasl/sasl_passwd
+	#chmod 0600 /etc/postfix/sasl/sasl_passwd.db
+	#postfix reload
+	#systemctl restart postfix
+}
+
 
 # --- CONFIGURACIÓN unattended-upgrades PARA PRUEBA MAIL ---
 # ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
-function config_unattended-upgrades_prueba_mail () {
+config_unattended-upgrades_prueba_mail () {
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
 	${encabezado//\#///}
 	// https://wiki.debian.org/UnattendedUpgrades#Unattended_Upgrades
@@ -67,7 +84,7 @@ EOF
 # --- CREA UN service PARA CONTINUAR LUEGO DEL REINICIO ---
 # https://wiki.debian.org/systemd#Creating_or_altering_services
 # $1: El service creado ejecuta $1 luego del reinicio
-function crear_reinicio-service () {
+crear_reinicio-service () {
 	local path_script_reinicio="$1"
  	
   	local nombre_reinicio_service=reinicio${MARCA}.service
@@ -96,7 +113,7 @@ EOF
 }
 
 #------------------FUNCIÓN PRINCIPAL------------------
-function principal () {
+principal () {
  	
   	# script para seguir el proceso luego del reboot (o del no reboot)
    	# debe coincidir con el de https://github.com/panchuz/linux_config_inicial/raw/main/....sh
@@ -128,9 +145,7 @@ function principal () {
 
 
 	# configurar postfix:
-	# mv /etc/postfix/mail.cf /etc/postfix/mail.cf.ORIGINAL${MARCA}
-	# configuración postfix >> /etc/postfix/mail.cf
-	# postfix reload
+	config_postfix_nullclient_gmail
  
  	# configurar uanttended-upgrades
 	# escribir $(encabezado) Unattended-Upgrade::Mail "root"; > 51unattended-upgrades${MARCA}
