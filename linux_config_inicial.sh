@@ -19,24 +19,24 @@ MARCA="_panchuz"
 generacion_encabezado_stdout () {
 	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
 	cat <<-EOF
-	# creado por (BASH_SOURCE):	${BASH_SOURCE}
-	# fecha y hora:	$(date +%F_%T_TZ:%Z)
-	# nombre host:	$(hostname)
-	# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
-	#
-	
-EOF
+		# creado por (BASH_SOURCE):	${BASH_SOURCE}
+		# fecha y hora:	$(date +%F_%T_TZ:%Z)
+		# nombre host:	$(hostname)
+		# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
+		#
+		
+	EOF
 }
 
 # CONFIGURACIÓN LOCAL
 crear_archivo_profile_locale () {
 	cat >/etc/profile.d/profile${MARCA}.sh <<-EOF
-	${encabezado}
-	# https://wiki.debian.org/Locale#Standard
-	# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_rationale_for_utf_8_locale
-
-	LANG=${LANG}
-EOF
+		${encabezado}
+		# https://wiki.debian.org/Locale#Standard
+		# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_rationale_for_utf_8_locale
+	
+		LANG=${LANG}
+	EOF
 }
 
 # CONFIGURACIÓN HUSO HORARIO
@@ -54,16 +54,22 @@ config_postfix_nullclient_gmail () {
 	cp /etc/postfix/mail.cf /etc/postfix/mail.cf.ORIGINAL${MARCA}
 	# configuración postfix >> /etc/postfix/mail.cf
 	postconf 'relayhost = [smtp.gmail.com]:587' \
-		'mydestination =' \
-		'inet_interfaces = loopback-only' \
-		'smtp_sasl_auth_enable = yes' \
-		'smtp_sasl_security_options = noanonymous' \
-		'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
-		'smtp_tls_security_level = encrypt' \
-		'smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt'
-	#wget /etc/postfix/sasl/sasl_passwd
-	#chmod 0600 /etc/postfix/sasl/sasl_passwd.db
-	#postfix reload
+			'mydestination =' \
+			'inet_interfaces = loopback-only' \
+			'smtp_sasl_auth_enable = yes' \
+			'smtp_sasl_security_options = noanonymous' \
+			'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
+			'smtp_tls_security_level = encrypt' \
+			'smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt'
+	cat >/etc/postfix/sasl/sasl_passwd <<-EOF
+		${encabezado}
+		# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
+		#
+		[smtp.gmail.com]:587 username@gmail.com:${1}
+	EOF
+	postmap /etc/postfix/sasl/sasl_passwd
+	chmod 0600 /etc/postfix/sasl/sasl_passwd*
+	postfix reload
 	#systemctl restart postfix
 }
 
@@ -72,12 +78,12 @@ config_postfix_nullclient_gmail () {
 # ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
 config_unattended-upgrades_prueba_mail () {
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
-	${encabezado//\#///}
-	// https://wiki.debian.org/UnattendedUpgrades#Unattended_Upgrades
-	// 
+		${encabezado//\#///}
+		// https://wiki.debian.org/UnattendedUpgrades#Unattended_Upgrades
+		// 
 	
-	Unattended-Upgrade::Mail "root";
-EOF
+		Unattended-Upgrade::Mail "root";
+	EOF
 }
 
 
@@ -91,24 +97,24 @@ crear_reinicio-service () {
  	local path_nombre_reinicio_service=/etc/systemd/system/${nombre_reinicio_service}
   
  	cat >${path_nombre_reinicio_service} <<-EOF
-	${encabezado}
-	# https://wiki.debian.org/systemd#Creating_or_altering_services
-	# https://operavps.com/docs/run-command-after-boot-in-linux/
- 
-	[Unit]
-	Description=Ejecuta ${path_script_reinicio} por única vez luego de reinicio
-	After=network.target auditd.service
-	ConditionFileIsExecutable=${path_script_reinicio}
-
-	[Service]
-	Type=oneshot
-	ExecStart=/bin/bash ${path_script_reinicio}
-	# desactiva el servicio luego que cumplió su función:
-	ExecStartPost=/bin/systemctl disable ${nombre_reinicio_service} 
-
-	[Install]
-	WantedBy=multi-user.target
-EOF
+		${encabezado}
+		# https://wiki.debian.org/systemd#Creating_or_altering_services
+		# https://operavps.com/docs/run-command-after-boot-in-linux/
+	 
+		[Unit]
+		Description=Ejecuta ${path_script_reinicio} por única vez luego de reinicio
+		After=network.target auditd.service
+		ConditionFileIsExecutable=${path_script_reinicio}
+	
+		[Service]
+		Type=oneshot
+		ExecStart=/bin/bash ${path_script_reinicio}
+		# desactiva el servicio luego que cumplió su función:
+		ExecStartPost=/bin/systemctl disable ${nombre_reinicio_service} 
+	
+		[Install]
+		WantedBy=multi-user.target
+	EOF
 	systemctl enable ${nombre_reinicio_service}
 }
 
