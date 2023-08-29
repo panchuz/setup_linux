@@ -53,15 +53,15 @@ config_huso_horario () {
 config_postfix_nullclient_gmail () {
 	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL${MARCA}
 	# configuración postfix >> /etc/postfix/main.cf
-	postconf 'relayhost = 'mydestination =' \
-			'[smtp.gmail.com]:587' \
-			'inet_interfaces = loopback-only' \
-			'compatibility_level = 3.6' \
-			'smtp_sasl_security_options = noanonymous' \
-			'smtp_tls_security_level = encrypt' \
-			'smtp_sasl_auth_enable = yes' \
-			'smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt' \
-			'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd'
+	postconf 'mydestination =' \
+		'relayhost = [smtp.gmail.com]:587' \
+		'inet_interfaces = loopback-only' \
+		'compatibility_level = 3.6' \
+		'smtp_sasl_security_options = noanonymous' \
+		'smtp_tls_security_level = encrypt' \
+		'smtp_sasl_auth_enable = yes' \
+		'smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt' \
+		'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd'
 	cat >/etc/postfix/sasl/sasl_passwd <<-EOF
 		${encabezado}
 		# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
