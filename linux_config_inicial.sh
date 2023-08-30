@@ -66,7 +66,7 @@ config_postfix_nullclient_gmail () {
 		${encabezado}
 		# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
 		#
-		[smtp.gmail.com]:587 username@gmail.com:${1}
+		[smtp.gmail.com]:587 panchuz.ar+pampa@gmail.com:${1}
 	EOF
 	postmap /etc/postfix/sasl/sasl_passwd
 	chmod 0600 /etc/postfix/sasl/sasl_passwd*
