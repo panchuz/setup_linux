@@ -57,7 +57,7 @@ config_huso_horario () {
 # https://www.computernetworkingnotes.com/linux-tutorials/how-to-configure-a-postfix-null-client-step-by-step.html
 config_postfix_nullclient_gmail () {
 # $1: contraseña de aplicación para Gmail
-
+	systemctl stop postfix
 	# el archivo sig. guarda las credenciales para usar el SMTP server de Gmail
 	cat >/etc/postfix/sasl/sasl_passwd <<-EOF
 		${encabezado}
@@ -89,7 +89,8 @@ config_postfix_nullclient_gmail () {
 		'smtp_sasl_auth_enable = yes' \
 		'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
 		'smtp_generic_maps = hash:/etc/postfix/generic'
-	postfix reload
+	#postfix reload
+	systemctl start postfix
 }
 
 
@@ -101,7 +102,7 @@ config_unattended-upgrades_prueba_mail () {
 		Unattended-Upgrade::MailReport "always"; /* SOLO PARA PROBAR */
 	EOF
 
-	unattended-upgrade -d && printf "Checkear recepción de mail de unattended-upgrades"
+	unattended-upgrade -d && printf "Checkear recepción de mail de unattended-upgrades\n"
 
 	# ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
