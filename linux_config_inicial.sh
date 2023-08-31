@@ -55,6 +55,7 @@ config_huso_horario () {
 # https://forum.proxmox.com/threads/get-postfix-to-send-notifications-email-externally.59940/
 # https://serverfault.com/questions/744761/postfix-aliases-will-be-ignored
 # https://www.computernetworkingnotes.com/linux-tutorials/how-to-configure-a-postfix-null-client-step-by-step.html
+# https://unix.stackexchange.com/questions/1449/lightweight-outgoing-smtp-server/731560#731560
 config_postfix_nullclient_gmail () {
 # $1: contraseña de aplicación para Gmail
 	systemctl stop postfix
@@ -74,6 +75,8 @@ config_postfix_nullclient_gmail () {
 		# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#fantasy
 		#
 		root panchuz.ar+$(hostname)@gmail.com
+		@localdomain panchuz.ar+$(hostname)@gmail.com
+		@$(hostname).localdomain panchuz.ar+$(hostname)@gmail.com
 	EOF
 	postmap /etc/postfix/generic
 	
