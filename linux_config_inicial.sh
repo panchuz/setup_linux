@@ -70,15 +70,15 @@ config_postfix_nullclient_gmail () {
 	chmod 0600 /etc/postfix/sasl/sasl_passwd*
 
 	# mapea usuarios locales a direcciones de mail
-	cat >/etc/postfix/generic <<-EOF
-		${encabezado}
-		# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#fantasy
-		#
-		root panchuz.ar+$(hostname)@gmail.com
-		@localdomain panchuz.ar+$(hostname)@gmail.com
-		@$(hostname).localdomain panchuz.ar+$(hostname)@gmail.com
-	EOF
-	postmap /etc/postfix/generic
+	#cat >/etc/postfix/generic <<-EOF
+	#	${encabezado}
+	#	# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#fantasy
+	#	#
+	#	root panchuz.ar+$(hostname)@gmail.com
+	#	@localdomain panchuz.ar+$(hostname)@gmail.com
+	#	@$(hostname).localdomain panchuz.ar+$(hostname)@gmail.com
+	#EOF
+	#postmap /etc/postfix/generic
 	
 	# configuración postfix >> /etc/postfix/main.cf
 	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL${MARCA}
@@ -91,7 +91,10 @@ config_postfix_nullclient_gmail () {
 		'smtp_sasl_security_options = noanonymous' \
 		'smtp_sasl_auth_enable = yes' \
 		'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
-		'smtp_generic_maps = hash:/etc/postfix/generic'
+		#'smtp_generic_maps = regexp:{{/(.*)@\$myorigin/ panchuz.ar+\$\${1}%$(hostname)@gmail.com}}' \
+		#'smtp_header_checks = pcre:{{/^From:.*/ REPLACE From: $(hostname) <\$\$myorigin>}}'
+		"smtp_generic_maps = regexp:{{/(.*)@\$myorigin/ panchuz.ar+\$\${1}%$(hostname)@gmail.com}}" \
+		"smtp_header_checks = pcre:{{/^From:.*/ REPLACE From: $(hostname) <noreplay@from.\$myorigin>}}"
 	#postfix reload
 	systemctl start postfix
 }
