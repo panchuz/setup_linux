@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# $1: contraseña de aplicación para Gmail 
+# $1: contraseña de aplicación para Gmail
+# $2: contraseña para usuario panchuz
 
 #######################################################################
 #  creado por panchuz                                                 #
@@ -7,6 +8,13 @@
 #  al template debian-12-standard_12.0-1_amd64.tar.zst de Proxmox VE  #
 #######################################################################
 
+# verificación de la cantidad de argumentos
+if [ $# -lt 1 ]; then
+	printf "Insuficiente cantidad de argumentos"
+	return 1
+fi
+
+# carga de biblioteca de funciones generales
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 # Opciones para la configuración
@@ -59,7 +67,7 @@ config_huso_horario () {
 config_postfix_nullclient_gmail () {
 # $1: contraseña de aplicación para Gmail
 	systemctl stop postfix
-	# el archivo sig. guarda las credenciales para usar el SMTP server de Gmail
+	# sasl_passwd: guarda las credenciales para usar el SMTP server de Gmail
 	cat >/etc/postfix/sasl/sasl_passwd <<-EOF
 		${encabezado}
 		# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
@@ -68,20 +76,13 @@ config_postfix_nullclient_gmail () {
 	EOF
 	postmap /etc/postfix/sasl/sasl_passwd
 	chmod 0600 /etc/postfix/sasl/sasl_passwd*
-
-	# mapea usuarios locales a direcciones de mail
-	#cat >/etc/postfix/generic <<-EOF
-	#	${encabezado}
-	#	# https://www.postfix.org/STANDARD_CONFIGURATION_README.html#fantasy
-	#	#
-	#	root panchuz.ar+$(hostname)@gmail.com
-	#	@localdomain panchuz.ar+$(hostname)@gmail.com
-	#	@$(hostname).localdomain panchuz.ar+$(hostname)@gmail.com
-	#EOF
-	#postmap /etc/postfix/generic
+	
+	# backup de la configuración original
+	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL${MARCA}
 	
 	# configuración postfix >> /etc/postfix/main.cf
-	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL${MARCA}
+	# smtp_generic_maps mapea usuarios locales a direcciones de mail
+	# smtp_header_checks modifica el header para que From: sea lindo
 	postconf 'mydestination =' \
 		'relayhost = [smtp.gmail.com]:587' \
 		'inet_interfaces = loopback-only' \
@@ -91,11 +92,8 @@ config_postfix_nullclient_gmail () {
 		'smtp_sasl_security_options = noanonymous' \
 		'smtp_sasl_auth_enable = yes' \
 		'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
-		#'smtp_generic_maps = regexp:{{/(.*)@\$myorigin/ panchuz.ar+\$\${1}%$(hostname)@gmail.com}}' \
-		#'smtp_header_checks = pcre:{{/^From:.*/ REPLACE From: $(hostname) <\$\$myorigin>}}'
-		"smtp_generic_maps = regexp:{{/(.*)@\$myorigin/ panchuz.ar+\$\${1}%$(hostname)@gmail.com}}" \
-		"smtp_header_checks = pcre:{{/^From:.*/ REPLACE From: $(hostname) <noreplay@from.\$myorigin>}}"
-	#postfix reload
+		"smtp_generic_maps = pcre:{{/(.*)@\$myorigin/ panchuz.ar+\$\${1}%$(hostname)@gmail.com}}" \
+		"smtp_header_checks = pcre:{{/^From:.*/ REPLACE From: $(hostname) <myorigin-@-\$myorigin>}}"
 	systemctl start postfix
 }
 
@@ -108,7 +106,7 @@ config_unattended-upgrades_prueba_mail () {
 		Unattended-Upgrade::MailReport "always"; /* SOLO PARA PROBAR */
 	EOF
 
-	unattended-upgrade -d && printf "Checkear recepción de mail de unattended-upgrades\n"
+	unattended-upgrade && printf "Checkear recepción de mail de unattended-upgrades\n"
 
 	# ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
