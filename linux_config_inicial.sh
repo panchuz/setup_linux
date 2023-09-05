@@ -9,8 +9,8 @@
 #######################################################################
 
 # verificación de la cantidad de argumentos
-if [ $# -lt 1 ]; then
-	printf "Insuficiente cantidad de argumentos"
+if [ $# -lt 2 ]; then
+	printf "Uso correcto: ${0} Gmail_app_passwd panchuz_passwd\n"
 	return 1
 fi
 
@@ -119,6 +119,24 @@ config_unattended-upgrades_prueba_mail () {
 }
 
 
+# --- Agregado y configuración usuario panchuz ---
+agregar_usuario_panchuz () {
+	#$1: contraseña del usuario
+
+	nombre_usuario=panchuz
+	id_usuario=1000
+
+	useradd --uid ${id_usuario} \
+		--shell /bin/bash \
+		--create-home \
+		--groups sudo,systemd-journal,adm \
+		${nombre_usuario}
+	echo "${nombre_usuario}:${1}" | chpasswd
+
+	# Para poder hacer ping http://unixetc.co.uk/2016/05/30/linux-capabilities-and-ping/
+	setcap cap_net_raw+p $(which ping)
+}
+
 # --- CREA UN service PARA CONTINUAR LUEGO DEL REINICIO ---
 # https://wiki.debian.org/systemd#Creating_or_altering_services
 # $1: El service creado ejecuta $1 luego del reinicio
@@ -153,6 +171,8 @@ crear_reinicio-service () {
 #------------------FUNCIÓN PRINCIPAL------------------
 principal () {
 # $1: contraseña de aplicación para Gmail
+# $2: contraseña usuario panchuz
+
   	# script para seguir el proceso luego del reboot (o del no reboot)
    	# debe coincidir con el de https://github.com/panchuz/linux_config_inicial/raw/main/....sh
 	local script_reinicio=linux_config_inicial_reinicio.sh
@@ -188,13 +208,8 @@ principal () {
  	# configurar uanttended-upgrades
 	config_unattended-upgrades_prueba_mail
 
-	# mail de prueba: unattended-upgrade -d
-	# escribir Unattended-Upgrade::MailReport "only-on-error"; >> 51unattended-upgrades${MARCA}
-
-	# panchuz = 1000
-	# groups
-	# set-cap
-	# journal
+	# agregado usuario panchuz
+	agregar_usuario_panchuz $2
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
@@ -211,7 +226,7 @@ principal () {
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( $EUID == 0 )); then
-	principal $1
+	principal $1 $2
 else
 	printf "ERROR: Este script se debe ejecutar con privilegios root\n"
 fi
