@@ -119,9 +119,9 @@ config_unattended-upgrades_prueba_mail () {
 }
 
 
-# --- Agregado y configuración usuario panchuz ---
-agregar_usuario_panchuz () {
-	#$1: contraseña del usuario
+# --- AGREGADO Y CONFIGURACIÓN USUARIO panchuz ---
+agregar_usuario_admin () {
+	#$1: contraseña del nuevo usuario
 
 	nombre_usuario=panchuz
 	id_usuario=1000
@@ -135,7 +135,36 @@ agregar_usuario_panchuz () {
 
 	# Para poder hacer ping http://unixetc.co.uk/2016/05/30/linux-capabilities-and-ping/
 	setcap cap_net_raw+p $(which ping)
+
+	# crea el archivo de la clave ssh pública del usuario
+	local usuario_sshkey_dir="$(eval printf "~${nombre_usuario}")/.ssh"
+	mkdir "${usuario_sshkey_dir}"
+	cat >"${usuario_sshkey_dir}"/authorized_keys${MARCA} <<-EOF
+		${encabezado}
+		# http://man.he.net/man5/authorized_keys
+		#
+		ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbs/SuIoMD/dLfLlsDzoGELTY8JngEaxjwkxbHxhEuY eddsa-key-20230307_panchuz
+	EOF
+	chown --recursive "${nombre_usuario}:${nombre_usuario}" "${usuario_sshkey_dir}"
+	chmod 600 "${usuario_sshkey_dir}"/*
 }
+
+
+# --- CONFIGURACIÓN sshd ---
+configuracion_sshd () {
+	# $1 puerto sshd
+
+	cat >/etc/ssh/sshd_config.d/sshd_config${MARCA}.conf <<-EOF
+		${encabezado}
+		# http://man.he.net/man5/sshd_config
+		#
+		Port $1
+		PermitRootLogin no
+		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys${MARCA}
+		PasswordAuthentication no
+	EOF
+}
+
 
 # --- CREA UN service PARA CONTINUAR LUEGO DEL REINICIO ---
 # https://wiki.debian.org/systemd#Creating_or_altering_services
@@ -209,7 +238,10 @@ principal () {
 	config_unattended-upgrades_prueba_mail
 
 	# agregado usuario panchuz
-	agregar_usuario_panchuz $2
+	agregar_usuario_admin $2
+
+	# configuración ssh
+	configuracion_sshd 31422
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
