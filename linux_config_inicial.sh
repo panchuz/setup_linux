@@ -163,6 +163,7 @@ configuracion_sshd () {
 		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys${MARCA}
 		PasswordAuthentication no
 	EOF
+	systemctl reload sshd
 }
 
 
