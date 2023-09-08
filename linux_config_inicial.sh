@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# $1: contraseña de aplicación para Gmail
-# $2: contraseña para usuario panchuz
+# $1: contraseña para usuario panchuz
 
 #######################################################################
 #  creado por panchuz                                                 #
@@ -9,13 +8,18 @@
 #######################################################################
 
 # verificación de la cantidad de argumentos
-if [ $# -lt 2 ]; then
-	printf "Uso correcto: ${0} Gmail_app_passwd panchuz_passwd\n"
+if [ $# -ne 1 ]; then
+	printf "Uso correcto: ${0} panchuz_passwd\n"
 	return 1
 fi
 
 # carga de biblioteca de funciones generales
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
+
+#carga de variables globales GOOGLE_APP_PASSWD y SSH_PUBLIC_KEY
+local ENC_LINK="U2FsdGVkX1/kFNrRuHzJ58PHQiPV75axBnudzVggDpulEsWFO9JMecz4FOPcAMy47CDVxCTLswFjrMeU4QlA0exQdqZExLIDgewCK8S2fVGXeJYX+7NuuSqZoQ7psOgYTCpdaHpV8DIOhP997i13Jg=="
+local LINK_DESENC=$(echo "$ENC_LINK" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:$1)
+source <(wget -O - --no-check-certificate "$LINK_DESENC")
 
 # Opciones para la configuración
 export LANG=C.utf8 # quedará de forma permamente. Ver: crear_archivo_profile_local ()
@@ -143,7 +147,7 @@ agregar_usuario_admin () {
 		${encabezado}
 		# http://man.he.net/man5/authorized_keys
 		#
-		ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbs/SuIoMD/dLfLlsDzoGELTY8JngEaxjwkxbHxhEuY eddsa-key-20230307_panchuz
+		${SSH_PUBLIC_KEY}
 	EOF
 	chown --recursive "${nombre_usuario}:${nombre_usuario}" "${usuario_sshkey_dir}"
 	chmod 600 "${usuario_sshkey_dir}"/*
@@ -259,7 +263,7 @@ principal () {
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( $EUID == 0 )); then
-	principal $1 $2
+	principal ${GOOGLE_APP_PASSWD} $1
 else
 	printf "ERROR: Este script se debe ejecutar con privilegios root\n"
 fi
