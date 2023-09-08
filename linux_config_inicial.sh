@@ -18,14 +18,11 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_confi
 
 #carga de variables globales GOOGLE_APP_PASSWD y SSH_PUBLIC_KEY
 # LINK_ENC fue encriptado usando openssl y el passwd de nuevo_usuario
-declare ENC_LINK=$(cat <<-EOF
-	U2FsdGVkX1/kFNrRuHzJ58PHQiPV75axBnudzVggDpulEsWFO9JMecz4FOPcAMy4
-	7CDVxCTLswFjrMeU4QlA0exQdqZExLIDgewCK8S2fVGXeJYX+7NuuSqZoQ7psOgY
-	TCpdaHpV8DIOhP997i13Jg==
-EOF
-)
-declare LINK_DESENC=$(echo "$ENC_LINK" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:$1)
-source <(wget -O - --no-check-certificate "$LINK_DESENC")
+declare LINK_ENC="U2FsdGVkX1/kFNrRuHzJ58PHQiPV75axBnudzVggDpulEsWFO9JMecz4FOPcAMy4
+7CDVxCTLswFjrMeU4QlA0exQdqZExLIDgewCK8S2fVGXeJYX+7NuuSqZoQ7psOgY
+TCpdaHpV8DIOhP997i13Jg=="
+declare LINK_DESENC=$(echo "$LINK_ENC" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:$1)
+source <(wget --no-check-certificate "$LINK_DESENC" -O -)
 
 # Opciones para la configuración
 export LANG=C.utf8 # quedará de forma permamente. Ver: crear_archivo_profile_local ()
