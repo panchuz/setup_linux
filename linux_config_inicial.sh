@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# $1: contraseña para usuario panchuz
+# $1: contraseña para usuario panchuz (nuevo_usuario)
 
 #######################################################################
 #  creado por panchuz                                                 #
@@ -17,8 +17,14 @@ fi
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 #carga de variables globales GOOGLE_APP_PASSWD y SSH_PUBLIC_KEY
-local ENC_LINK="U2FsdGVkX1/kFNrRuHzJ58PHQiPV75axBnudzVggDpulEsWFO9JMecz4FOPcAMy47CDVxCTLswFjrMeU4QlA0exQdqZExLIDgewCK8S2fVGXeJYX+7NuuSqZoQ7psOgYTCpdaHpV8DIOhP997i13Jg=="
-local LINK_DESENC=$(echo "$ENC_LINK" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:$1)
+# LINK_ENC fue encriptado usando openssl y el passwd de nuevo_usuario
+declare ENC_LINK=$(cat <<-EOF
+	U2FsdGVkX1/kFNrRuHzJ58PHQiPV75axBnudzVggDpulEsWFO9JMecz4FOPcAMy4
+	7CDVxCTLswFjrMeU4QlA0exQdqZExLIDgewCK8S2fVGXeJYX+7NuuSqZoQ7psOgY
+	TCpdaHpV8DIOhP997i13Jg==
+EOF
+)
+declare LINK_DESENC=$(echo "$ENC_LINK" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:$1)
 source <(wget -O - --no-check-certificate "$LINK_DESENC")
 
 # Opciones para la configuración
