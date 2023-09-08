@@ -3,7 +3,7 @@
 # Determinación robusta* del directorio de este script para que conste en el encabezado
 # *a prueba de source y simlinks de directorio y archivo
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
-function script_directorio_nombre_stdout () {
+script_directorio_nombre_stdout () {
 	local source=${BASH_SOURCE[0]}
 	while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
 	  local directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
@@ -15,12 +15,33 @@ function script_directorio_nombre_stdout () {
 	printf "${directorio}/${nombre}"
 }
 
+# --- DESENCRIPTA con openssl ---
+# retorna 0/1 si éxito/fracaso: return OK
+desencript_stdout () {
+	# $1: cosa encriptada
+	# $2: password
+	echo $1 | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:$2
+}
+
+
+# --- ENCRIPTA con openssl --- NO FUNCA !!!!!!!!!!!!!!!!!
+# retorna 0/1 si éxito/fracaso: return OK ???
+encript_stdout () {
+	# $1: cosa a encriptar
+	# $2: password
+	if [ $(#{$1}) -ne 0) ]; then
+		echo $1 | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:$2;
+	else
+		exit 1
+	fi
+}
+
 
 # apt-get update and upgrade automate and unattended
 # https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
 # https://devicetests.com/silence-apt-get-install-output
 # https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
-function debian_dist-upgrade_install () {
+debian_dist-upgrade_install () {
 	## argumentos: paquetes a instalar luego del dist-upgrade
 	# se comentó la sig línea para evitar el reinicio automático
 	#export NEEDRESTART_MODE=a
@@ -52,7 +73,7 @@ function debian_dist-upgrade_install () {
 
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
-function verif_privilegios_root () {
+verif_privilegios_root () {
 	if (( $EUID != 0 )); then
 		printf "ERROR: Este script se debe ejecutar con privilegios root (printf)\n"
 		return 1
