@@ -15,25 +15,34 @@ script_directorio_nombre_stdout () {
 	printf "${directorio}/${nombre}"
 }
 
+
+# --- ENCRIPTA con openssl ---
+# retorna 0/1 si éxito/fracaso
+encript_stdout () {
+	# $1: cosa a encriptar
+	# $2: password
+	if [ $# -eq 2 ]; then
+		echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:"$2";
+	else
+		return 1
+	fi
+}
+
+
+# --- GENERA Y GUARDA link_args.aes256 ---
+genera_link_args_aes256 () {
+	# $1: password
+	encript_stdout "${_LINK_ARGS}" "$1" > link_args.aes256
+}
+
+
+
 # --- DESENCRIPTA con openssl ---
 # retorna 0/1 si éxito/fracaso: return OK
 desencript_stdout () {
 	# $1: cosa encriptada
 	# $2: password
-	echo $1 | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:$2
-}
-
-
-# --- ENCRIPTA con openssl --- NO FUNCA !!!!!!!!!!!!!!!!!
-# retorna 0/1 si éxito/fracaso: return OK ???
-encript_stdout () {
-	# $1: cosa a encriptar
-	# $2: password
-	if [ $(#{$1}) -ne 0) ]; then
-		echo $1 | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:$2;
-	else
-		exit 1
-	fi
+	echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:"$2"
 }
 
 
