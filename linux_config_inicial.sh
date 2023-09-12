@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# $1: contraseña para usuario panchuz (nuevo_usuario)
+# $1: passwd para desencriptar link_args.aes256
 
 #######################################################################
 #  creado por panchuz                                                 #
@@ -9,24 +9,19 @@
 
 # verificación de la cantidad de argumentos
 if [ $# -ne 1 ]; then
-	printf "Uso correcto: ${0} panchuz_passwd\n"
+	printf "Uso: ${0} passwd_link_args_aes256\n"
 	return 1
 fi
 
 # carga de biblioteca de funciones generales
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
-#carga de variables globales GOOGLE_APP_PASSWD y SSH_PUBLIC_KEY
-wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_enc.aes256
-declare LINK_DESENC=$(echo "$LINK_ENC" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:$1 -in link_enc.aes256)
-source <(wget --quiet -O - --no-check-certificate "$LINK_DESENC")
-
 # Opciones para la configuración
-export LANG=C.utf8 # quedará de forma permamente. Ver: crear_archivo_profile_local ()
-export TZ='America/Argentina/Buenos_Aires'
+#export LANG=C.utf8 # quedará de forma permamente. Ver: crear_archivo_profile_local ()
+#export TZ='America/Argentina/Buenos_Aires'
 
 # el contenido de la sig variable sirve para appendear a los nombres de los archivos creados por este script
-MARCA="_panchuz"
+#MARCA="_panchuz"
 
 # resto de las variables se definen en función principal
 
@@ -69,14 +64,13 @@ config_huso_horario () {
 # https://www.computernetworkingnotes.com/linux-tutorials/how-to-configure-a-postfix-null-client-step-by-step.html
 # https://unix.stackexchange.com/questions/1449/lightweight-outgoing-smtp-server/731560#731560
 config_postfix_nullclient_gmail () {
-# $1: contraseña de aplicación para Gmail
 	systemctl stop postfix
 	# sasl_passwd: guarda las credenciales para usar el SMTP server de Gmail
 	cat >/etc/postfix/sasl/sasl_passwd <<-EOF
 		${encabezado}
 		# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
 		#
-		[smtp.gmail.com]:587 panchuz.ar@gmail.com:${1}
+		[smtp.gmail.com]:587 ${CUENTA_GOOGLE}@gmail.com:${GMAIL_APP_PASSWD}
 	EOF
 	postmap /etc/postfix/sasl/sasl_passwd
 	chmod 0600 /etc/postfix/sasl/sasl_passwd*
@@ -96,7 +90,7 @@ config_postfix_nullclient_gmail () {
 		'smtp_sasl_security_options = noanonymous' \
 		'smtp_sasl_auth_enable = yes' \
 		'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
-		"smtp_generic_maps = pcre:{{/(.*)@\$myorigin/ panchuz.ar+\$\${1}%$(hostname)@gmail.com}}" \
+		"smtp_generic_maps = pcre:{{/(.*)@\$myorigin/ $CUENTA_GOOGLE+\$\${1}%$(hostname)@gmail.com}}" \
 		"smtp_header_checks = pcre:{{/^From:.*/ REPLACE From: $(hostname) <myorigin-@-\$myorigin>}}"
 	systemctl start postfix
 }
@@ -125,32 +119,32 @@ config_unattended-upgrades_prueba_mail () {
 
 # --- AGREGADO Y CONFIGURACIÓN USUARIO panchuz ---
 agregar_usuario_admin () {
-	#$1: contraseña del nuevo usuario
+	nuevo_usuario=$1
+	id_nuevo_usuario=$2
+	passwd_nuevo_usuario="$3"
+	ssh_pub_key_nuevo_usuario="$4"
 
-	nombre_usuario=panchuz
-	id_usuario=1000
-
-	useradd --uid ${id_usuario} \
+	useradd --uid ${id_nuevo_usuario} \
 		--shell /bin/bash \
 		--create-home \
 		--groups sudo,systemd-journal,adm \
-		${nombre_usuario}
-	echo "${nombre_usuario}:${1}" | chpasswd
+		${nuevo_usuario}
+	echo "$nuevo_usuario:$passwd_nuevo_usuario" | chpasswd
 
 	# Para poder hacer ping http://unixetc.co.uk/2016/05/30/linux-capabilities-and-ping/
 	setcap cap_net_raw+p $(which ping)
 
 	# crea el archivo de la clave ssh pública del usuario
-	local usuario_sshkey_dir="$(eval printf "~${nombre_usuario}")/.ssh"
-	mkdir "${usuario_sshkey_dir}"
-	cat >"${usuario_sshkey_dir}"/authorized_keys${MARCA} <<-EOF
+	local nuevo_usuario_sshkey_dir="$(eval printf "~${nuevo_usuario}")/.ssh"
+	mkdir "$nuevo_usuario_sshkey_dir"
+	cat >"$nuevo_usuario_sshkey_dir"/authorized_keys${MARCA} <<-EOF
 		${encabezado}
 		# http://man.he.net/man5/authorized_keys
 		#
-		${SSH_PUBLIC_KEY}
+		${ssh_pub_key_nuevo_usuario}
 	EOF
-	chown --recursive "${nombre_usuario}:${nombre_usuario}" "${usuario_sshkey_dir}"
-	chmod 600 "${usuario_sshkey_dir}"/*
+	chown --recursive "${nuevo_usuario}:${nuevo_usuario}" "$nuevo_usuario_sshkey_dir"
+	chmod 600 "$nuevo_usuario_sshkey_dir"/*
 }
 
 
@@ -204,15 +198,18 @@ crear_reinicio-service () {
 
 #------------------FUNCIÓN PRINCIPAL------------------
 principal () {
-# $1: contraseña de aplicación para Gmail
-# $2: contraseña usuario panchuz
+	passwd_link_args_eas256="$1"
+
+	#carga de argumentos
+	wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_args.aes256
+	link_args=$(desencript_stdout "$(cat link_args.aes256)" $passwd_link_args_eas256)
+	source <(wget --quiet -O - --no-check-certificate "$link_args")
 
   	# script para seguir el proceso luego del reboot (o del no reboot)
    	# debe coincidir con el de https://github.com/panchuz/linux_config_inicial/raw/main/....sh
 	local script_reinicio=linux_config_inicial_reinicio.sh
  	local path_script_reinicio=/root/${script_reinicio}
   
-	#wget -qP /root https://github.com/panchuz/linux_config_inicial/raw/main/${script_reinicio} &&
 	wget -qO ${path_script_reinicio} https://github.com/panchuz/linux_config_inicial/raw/main/${script_reinicio}
 	if [ $? -eq 0 ]; then
 		chmod +x ${path_script_reinicio}
@@ -237,16 +234,22 @@ principal () {
 	##### rsyslog: https://itslinuxfoss.com/find-postfix-log-files/
 
 	# configurar postfix como nullclient/smtp de gmail/no-FQDN:
-	config_postfix_nullclient_gmail $1
+	# usa $CUENTA_GOOGLE y $GMAIL_APP_PASSWD
+	config_postfix_nullclient_gmail
  
  	# configurar uanttended-upgrades
 	config_unattended-upgrades_prueba_mail
 
 	# agregado usuario panchuz
-	agregar_usuario_admin $2
+	# si no se proporcionó PASSWD_NUEVO_USUARIO, se usa passwd_link_args_eas256 en su lugar
+	if [ -n "$PASSWD_NUEVO_USUARIO" ]; then
+		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO $PASSWD_NUEVO_USUARIO "$SSH_PUB_KEY_NUEVO_USUARIO"
+	else
+		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO $passwd_link_args_eas256 "$SSH_PUB_KEY_NUEVO_USUARIO"
+	fi
 
 	# configuración ssh
-	configuracion_sshd 31422
+	configuracion_sshd $PUERTO_SSHD
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
@@ -263,7 +266,7 @@ principal () {
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( $EUID == 0 )); then
-	principal ${GOOGLE_APP_PASSWD} $1
+	principal $1
 else
 	printf "ERROR: Este script se debe ejecutar con privilegios root\n"
 fi
