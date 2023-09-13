@@ -17,11 +17,11 @@ fi
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 # Opciones para la configuración
-export LANG=C.utf8 # quedará de forma permamente. Ver: crear_archivo_profile_local ()
-export TZ='America/Argentina/Buenos_Aires'
+#export LANG=C.utf8 # quedará de forma permamente. Ver: crear_archivo_profile_local ()
+#export TZ='America/Argentina/Buenos_Aires'
 
 # el contenido de la sig variable sirve para appendear a los nombres de los archivos creados por este script
-MARCA="_panchuz"
+#MARCA="_panchuz"
 
 # resto de las variables se definen en función principal
 
@@ -104,7 +104,7 @@ config_unattended-upgrades_prueba_mail () {
 		Unattended-Upgrade::MailReport "always"; /* SOLO PARA PROBAR */
 	EOF
 
-	unattended-upgrade && printf "Checkear recepción de mail de unattended-upgrades\n"
+	unattended-upgrade && echo "Checkear recepción de mail de unattended-upgrades"
 
 	# ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
@@ -135,7 +135,7 @@ agregar_usuario_admin () {
 	setcap cap_net_raw+p $(which ping)
 
 	# crea el archivo de la clave ssh pública del usuario
-	local nuevo_usuario_sshkey_dir="$(eval printf "~${nuevo_usuario}")/.ssh"
+	local nuevo_usuario_sshkey_dir="$(eval echo "~${nuevo_usuario}")/.ssh"
 	mkdir "$nuevo_usuario_sshkey_dir"
 	cat >"$nuevo_usuario_sshkey_dir"/authorized_keys${MARCA} <<-EOF
 		${encabezado}
@@ -214,7 +214,7 @@ principal () {
 	if [ $? -eq 0 ]; then
 		chmod +x ${path_script_reinicio}
 	else
-		printf "ABORTANDO: No se pudo descargar ${script_reinicio}\n"
+		echo "ABORTANDO: No se pudo descargar ${script_reinicio}"
    		return 1
 	fi
     
@@ -254,11 +254,11 @@ principal () {
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
 		crear_reinicio-service "$path_script_reinicio"
-  		printf "Se procede a reiniciar\n"
+  		echo "Se procede a reiniciar"
 		/bin/sleep 5
 		reboot
  	else
- 		printf "NO se necesita reiniciar\n"
+ 		echo "NO se necesita reiniciar"
    		${path_script_reinicio}
   	fi
 }
@@ -268,6 +268,6 @@ principal () {
 if (( $EUID == 0 )); then
 	principal $1
 else
-	printf "ERROR: Este script se debe ejecutar con privilegios root\n"
+	echo "ERROR: Este script se debe ejecutar con privilegios root"
 fi
-printf "con esto termina el script\nbye\n"
+echo "con esto termina el script...bye"
