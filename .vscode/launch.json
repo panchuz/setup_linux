@@ -4,12 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         
         {
             "type": "bashdb",
             "request": "launch",
             "name": "Bash-Debug (simplest configuration)",
-            "program": "sudo -D /root wget -qP /root https://github.com/panchuz/linux_config_inicial/raw/main/linux_config_inicial.sh && sudo -D /root source /root/linux_config_inicial.sh pancho00"
+            "program": "./linux_config_inicial.sh pancho00"
         }
     ]
 }
