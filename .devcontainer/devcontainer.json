@@ -1,5 +1,12 @@
 {
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
-  }
+},
+"customizations": {
+	"vscode": {
+		"extensions": [
+			"rogalmic.bash-debug"
+		]
+	}
+}
 }
