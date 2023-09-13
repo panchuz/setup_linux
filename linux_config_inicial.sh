@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# $1: passwd para desencriptar link_args.aes256
+passwd_link_args_aes256="$1" # passwd para desencriptar link_args.aes256
 
 #######################################################################
 #  creado por panchuz                                                 #
@@ -217,15 +217,15 @@ principal () {
 		echo "ABORTANDO: No se pudo descargar ${script_reinicio}"
    		return 1
 	fi
-    
+
+ 	# Setea huso horario
+	config_huso_horario
+ 
 	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
  	local encabezado="$(generacion_encabezado_stdout)"
   
   	# genera locale $LANG permanente
 	crear_archivo_profile_locale
- 
- 	# Setea huso horario
-	config_huso_horario
  
  	# Actualización desatendida "confdef/confold"
 	# mailx es pedido en /etc/apt/apt.conf.d/50unattended-upgrades para notificar por mail
@@ -266,8 +266,7 @@ principal () {
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( $EUID == 0 )); then
-	principal $1
+	principal "$passwd_link_args_aes256"
 else
 	echo "ERROR: Este script se debe ejecutar con privilegios root"
 fi
-echo "con esto termina el script...bye"
