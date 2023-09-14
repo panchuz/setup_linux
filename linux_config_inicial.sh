@@ -166,11 +166,11 @@ crear_reinicio-service () {
 
 #------------------FUNCIÓN PRINCIPAL------------------
 principal () {
-	passwd_link_args_eas256="$1"
+	passwd_link_args_aes256="$1"
 
 	#carga de argumentos
 	wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_args.aes256
-	link_args=$(desencript_stdout "$(cat link_args.aes256)" $passwd_link_args_eas256)
+	link_args=$(desencript_stdout "$(cat link_args.aes256)" $passwd_link_args_aes256)
 	source <(wget --quiet -O - --no-check-certificate "$link_args")
 
   	# script para seguir el proceso luego del reboot (o del no reboot)
@@ -210,11 +210,11 @@ principal () {
 
 	# agregado usuario panchuz
 	# usa vars globales:  NUEVO_USUARIO, ID_NUEVO_USUARIO y SSH_PUB_KEY_NUEVO_USUARIO
-	# si no se proporcionó PASSWD_NUEVO_USUARIO, se usa passwd_link_args_eas256 en su lugar
+	# si no se proporcionó PASSWD_NUEVO_USUARIO, se usa passwd_link_args_aes256 en su lugar
 	if [ -n "$PASSWD_NUEVO_USUARIO" ]; then
 		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO "$PASSWD_NUEVO_USUARIO" "$SSH_PUB_KEY_NUEVO_USUARIO"
 	else
-		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO "$passwd_link_args_eas256" "$SSH_PUB_KEY_NUEVO_USUARIO"
+		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO "$passwd_link_args_aes256" "$SSH_PUB_KEY_NUEVO_USUARIO"
 	fi
 
 	# configuración sshd: puerto y agrega autorizedkeys con MARCA
