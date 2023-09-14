@@ -92,7 +92,7 @@ agregar_usuario_admin () {
 		--create-home \
 		--groups sudo,systemd-journal,adm \
 		${nuevo_usuario} \
-		&& return 1
+		|| return 1
 
 	echo "$nuevo_usuario:$passwd_nuevo_usuario" | chpasswd
 
