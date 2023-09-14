@@ -117,46 +117,14 @@ config_unattended-upgrades_prueba_mail () {
 }
 
 
-# --- AGREGADO Y CONFIGURACIÓN USUARIO panchuz ---
-agregar_usuario_admin () {
-	nuevo_usuario=$1
-	id_nuevo_usuario=$2
-	passwd_nuevo_usuario="$3"
-	ssh_pub_key_nuevo_usuario="$4"
-
-	useradd --uid ${id_nuevo_usuario} \
-		--shell /bin/bash \
-		--create-home \
-		--groups sudo,systemd-journal,adm \
-		${nuevo_usuario}
-	echo "$nuevo_usuario:$passwd_nuevo_usuario" | chpasswd
-
-	# Para poder hacer ping http://unixetc.co.uk/2016/05/30/linux-capabilities-and-ping/
-	setcap cap_net_raw+p $(which ping)
-
-	# crea el archivo de la clave ssh pública del usuario
-	local nuevo_usuario_sshkey_dir="$(eval echo "~${nuevo_usuario}")/.ssh"
-	mkdir "$nuevo_usuario_sshkey_dir"
-	cat >"$nuevo_usuario_sshkey_dir"/authorized_keys${MARCA} <<-EOF
-		${encabezado}
-		# http://man.he.net/man5/authorized_keys
-		#
-		${ssh_pub_key_nuevo_usuario}
-	EOF
-	chown --recursive "${nuevo_usuario}:${nuevo_usuario}" "$nuevo_usuario_sshkey_dir"
-	chmod 600 "$nuevo_usuario_sshkey_dir"/*
-}
-
-
 # --- CONFIGURACIÓN sshd ---
 configuracion_sshd () {
-	# $1 puerto sshd
 
-	cat >/etc/ssh/sshd_config.d/sshd_config${MARCA}.conf <<-EOF
+	cat >/etc/ssh/sshd_config.d/sshd_config$MARCA.conf <<-EOF
 		${encabezado}
 		# http://man.he.net/man5/sshd_config
 		#
-		Port $1
+		Port $PUERTO_SSHD
 		PermitRootLogin no
 		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys${MARCA}
 		PasswordAuthentication no
@@ -241,15 +209,17 @@ principal () {
 	config_unattended-upgrades_prueba_mail
 
 	# agregado usuario panchuz
+	# usa vars globales:  NUEVO_USUARIO, ID_NUEVO_USUARIO y SSH_PUB_KEY_NUEVO_USUARIO
 	# si no se proporcionó PASSWD_NUEVO_USUARIO, se usa passwd_link_args_eas256 en su lugar
 	if [ -n "$PASSWD_NUEVO_USUARIO" ]; then
-		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO $PASSWD_NUEVO_USUARIO "$SSH_PUB_KEY_NUEVO_USUARIO"
+		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO "$PASSWD_NUEVO_USUARIO" "$SSH_PUB_KEY_NUEVO_USUARIO"
 	else
-		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO $passwd_link_args_eas256 "$SSH_PUB_KEY_NUEVO_USUARIO"
+		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO "$passwd_link_args_eas256" "$SSH_PUB_KEY_NUEVO_USUARIO"
 	fi
 
-	# configuración ssh
-	configuracion_sshd $PUERTO_SSHD
+	# configuración sshd: puerto y agrega autorizedkeys con MARCA
+	# usa vars globales: encabezado, MARCA y PUERTO_SSHD
+	configuracion_sshd
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then

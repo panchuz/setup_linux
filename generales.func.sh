@@ -80,6 +80,40 @@ debian_dist-upgrade_install () {
 }
 
 
+# --- AGREGADO Y CONFIGURACIÓN NUEVO_USUARIO como admin ---
+agregar_usuario_admin () {
+	nuevo_usuario="$1"
+	id_nuevo_usuario="$2"
+	passwd_nuevo_usuario="$3"
+	ssh_pub_key_nuevo_usuario="$4"
+
+	useradd --uid ${id_nuevo_usuario} \
+		--shell /bin/bash \
+		--create-home \
+		--groups sudo,systemd-journal,adm \
+		${nuevo_usuario} \
+		&& return 1
+
+	echo "$nuevo_usuario:$passwd_nuevo_usuario" | chpasswd
+
+	# Para poder hacer ping http://unixetc.co.uk/2016/05/30/linux-capabilities-and-ping/
+	setcap cap_net_raw+p $(which ping)
+
+	# crea el archivo de la clave ssh pública del usuario
+	local nuevo_usuario_sshkey_dir="$(eval echo "~${nuevo_usuario}")/.ssh"
+	mkdir "$nuevo_usuario_sshkey_dir"
+	cat >"$nuevo_usuario_sshkey_dir"/authorized_keys${MARCA} <<-EOF
+		${encabezado}
+		# http://man.he.net/man5/authorized_keys
+		#
+		${ssh_pub_key_nuevo_usuario}
+	EOF
+	chown --recursive "${nuevo_usuario}:${nuevo_usuario}" "$nuevo_usuario_sshkey_dir"
+	chmod 600 "$nuevo_usuario_sshkey_dir"/*
+}
+
+
+
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 verif_privilegios_root () {
