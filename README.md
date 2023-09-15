@@ -19,6 +19,7 @@ source /root/linux_config_inicial.sh passwd_link_args
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 ### Formato del archivo de Argumentos para linux_config_inicial.sh
+```
 #variable=contenido
 MARCA="_marca"
 LANG="C.utf8"
@@ -29,4 +30,4 @@ PUERTO_SSHD=12345
 NUEVO_USUARIO=alguien
 PASSWD_NUEVO_USUARIO=
 SSH_PUBLIC_KEY="tipo key cometario"
-
+```
