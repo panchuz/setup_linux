@@ -9,7 +9,7 @@ passwd_link_args_aes256="$1" # passwd para desencriptar link_args.aes256
 
 # verificación de la cantidad de argumentos
 if [ $# -ne 1 ]; then
-	echo "Uso: $BASH_SOURCE passwd_link_args_aes256"
+	echo "Uso: ${BASH_SOURCE[0]} passwd_link_args_aes256"
 	return 1
 fi
 
@@ -30,7 +30,7 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_confi
 generacion_encabezado_stdout () {
 	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
 	cat <<-EOF
-		# creado por (BASH_SOURCE):	${BASH_SOURCE}
+		# creado por (BASH_SOURCE):	${BASH_SOURCE[0]}
 		# fecha y hora:	$(date +%F_%T_TZ:%Z)
 		# nombre host:	$(hostname)
 		# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
@@ -41,19 +41,19 @@ generacion_encabezado_stdout () {
 
 # CONFIGURACIÓN LOCAL
 crear_archivo_profile_locale () {
-	cat >/etc/profile.d/profile${MARCA}.sh <<-EOF
-		${encabezado}
+	cat >/etc/profile.d/profile"$MARCA".sh <<-EOF
+		$encabezado
 		# https://wiki.debian.org/Locale#Standard
 		# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_rationale_for_utf_8_locale
 	
-		LANG=${LANG}
+		LANG=$LANG
 	EOF
 }
 
 # CONFIGURACIÓN HUSO HORARIO
 # https://linuxize.com/post/how-to-set-or-change-timezone-in-linux/
 config_huso_horario () {
-	timedatectl set-timezone ${TZ}
+	timedatectl set-timezone "$TZ"
 }
 
 # --- CONFIGURACIÓN postfix ---
@@ -67,16 +67,16 @@ config_postfix_nullclient_gmail () {
 	systemctl stop postfix
 	# sasl_passwd: guarda las credenciales para usar el SMTP server de Gmail
 	cat >/etc/postfix/sasl/sasl_passwd <<-EOF
-		${encabezado}
+		$encabezado
 		# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
 		#
-		[smtp.gmail.com]:587 ${CUENTA_GOOGLE}@gmail.com:${GMAIL_APP_PASSWD}
+		[smtp.gmail.com]:587 ${CUENTA_GOOGLE}@gmail.com:$GMAIL_APP_PASSWD
 	EOF
 	postmap /etc/postfix/sasl/sasl_passwd
 	chmod 0600 /etc/postfix/sasl/sasl_passwd*
 	
 	# backup de la configuración original
-	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL${MARCA}
+	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL"$MARCA"
 	
 	# configuración postfix >> /etc/postfix/main.cf
 	# smtp_generic_maps mapea usuarios locales a direcciones de mail
@@ -99,7 +99,7 @@ config_postfix_nullclient_gmail () {
 # --- CONFIGURACIÓN unattended-upgrades PRUEBA MAIL ---
 config_unattended-upgrades_prueba_mail () {
 
-	cat >/etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
+	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARCA" <<-EOF
 		Unattended-Upgrade::Mail "root";
 		Unattended-Upgrade::MailReport "always"; /* SOLO PARA PROBAR */
 	EOF
@@ -107,7 +107,7 @@ config_unattended-upgrades_prueba_mail () {
 	unattended-upgrade && echo "Checkear recepción de mail de unattended-upgrades"
 
 	# ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
-	cat >/etc/apt/apt.conf.d/51unattended-upgrades${MARCA} <<-EOF
+	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARCA" <<-EOF
 		${encabezado//\#///}
 		// https://wiki.debian.org/UnattendedUpgrades#Unattended_Upgrades
 		// 
@@ -120,49 +120,18 @@ config_unattended-upgrades_prueba_mail () {
 # --- CONFIGURACIÓN sshd ---
 configuracion_sshd () {
 
-	cat >/etc/ssh/sshd_config.d/sshd_config$MARCA.conf <<-EOF
-		${encabezado}
+	cat >/etc/ssh/sshd_config.d/sshd_config"$MARCA".conf <<-EOF
+		$encabezado
 		# http://man.he.net/man5/sshd_config
 		#
 		Port $PUERTO_SSHD
 		PermitRootLogin no
-		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys${MARCA}
+		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys"$MARCA"
 		PasswordAuthentication no
 	EOF
 	systemctl reload sshd
 }
 
-
-# --- CREA UN service PARA CONTINUAR LUEGO DEL REINICIO ---
-# https://wiki.debian.org/systemd#Creating_or_altering_services
-# $1: El service creado ejecuta $1 luego del reinicio
-crear_reinicio-service () {
-	local path_script_reinicio="$1"
- 	
-  	local nombre_reinicio_service=reinicio${MARCA}.service
- 	local path_nombre_reinicio_service=/etc/systemd/system/${nombre_reinicio_service}
-  
- 	cat >${path_nombre_reinicio_service} <<-EOF
-		${encabezado}
-		# https://wiki.debian.org/systemd#Creating_or_altering_services
-		# https://operavps.com/docs/run-command-after-boot-in-linux/
-	 
-		[Unit]
-		Description=Ejecuta ${path_script_reinicio} por única vez luego de reinicio
-		After=network.target auditd.service
-		ConditionFileIsExecutable=${path_script_reinicio}
-	
-		[Service]
-		Type=oneshot
-		ExecStart=/bin/bash ${path_script_reinicio}
-		# desactiva el servicio luego que cumplió su función:
-		ExecStartPost=/bin/systemctl disable ${nombre_reinicio_service} 
-	
-		[Install]
-		WantedBy=multi-user.target
-	EOF
-	systemctl enable ${nombre_reinicio_service}
-}
 
 #------------------FUNCIÓN PRINCIPAL------------------
 principal () {
@@ -170,27 +139,15 @@ principal () {
 
 	#carga de argumentos
 	wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_args.aes256
-	link_args=$(desencript_stdout "$(cat link_args.aes256)" $passwd_link_args_aes256)
+	link_args=$(desencript_stdout "$(cat link_args.aes256)" "$passwd_link_args_aes256")
 	source <(wget --quiet -O - --no-check-certificate "$link_args")
-
-  	# script para seguir el proceso luego del reboot (o del no reboot)
-   	# debe coincidir con el de https://github.com/panchuz/linux_config_inicial/raw/main/....sh
-	local script_reinicio=linux_config_inicial_reinicio.sh
- 	local path_script_reinicio=/root/${script_reinicio}
-  
-	wget -qO ${path_script_reinicio} https://github.com/panchuz/linux_config_inicial/raw/main/${script_reinicio}
-	if [ $? -eq 0 ]; then
-		chmod +x ${path_script_reinicio}
-	else
-		echo "ABORTANDO: No se pudo descargar ${script_reinicio}"
-   		return 1
-	fi
 
  	# Setea huso horario
 	config_huso_horario
  
 	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
- 	local encabezado="$(generacion_encabezado_stdout)"
+ 	local encabezado
+	encabezado="$(generacion_encabezado_stdout)"
   
   	# genera locale $LANG permanente
 	crear_archivo_profile_locale
@@ -212,9 +169,9 @@ principal () {
 	# usa vars globales:  NUEVO_USUARIO, ID_NUEVO_USUARIO y SSH_PUB_KEY_NUEVO_USUARIO
 	# si no se proporcionó PASSWD_NUEVO_USUARIO, se usa passwd_link_args_aes256 en su lugar
 	if [ -n "$PASSWD_NUEVO_USUARIO" ]; then
-		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO "$PASSWD_NUEVO_USUARIO" "$SSH_PUB_KEY_NUEVO_USUARIO"
+		agregar_usuario_admin "$NUEVO_USUARIO" "$ID_NUEVO_USUARIO" "$PASSWD_NUEVO_USUARIO" "$SSH_PUB_KEY_NUEVO_USUARIO"
 	else
-		agregar_usuario_admin $NUEVO_USUARIO $ID_NUEVO_USUARIO "$passwd_link_args_aes256" "$SSH_PUB_KEY_NUEVO_USUARIO"
+		agregar_usuario_admin "$NUEVO_USUARIO" "$ID_NUEVO_USUARIO" "$passwd_link_args_aes256" "$SSH_PUB_KEY_NUEVO_USUARIO"
 	fi
 
 	# configuración sshd: puerto y agrega autorizedkeys con MARCA
@@ -223,19 +180,17 @@ principal () {
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
-		crear_reinicio-service "$path_script_reinicio"
   		echo "Se procede a reiniciar"
 		/bin/sleep 5
 		reboot
  	else
  		echo "NO se necesita reiniciar"
-   		${path_script_reinicio}
   	fi
 }
 
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
-if (( $EUID == 0 )); then
+if (( EUID == 0 )); then
 	principal "$passwd_link_args_aes256"
 else
 	echo "ERROR: Este script se debe ejecutar con privilegios root"
