@@ -1,18 +1,22 @@
+#!/usr/bin/env bash
 # FUNCIONES GENERALES para bash scripts
 
 # Determinación robusta* del directorio de este script para que conste en el encabezado
 # *a prueba de source y simlinks de directorio y archivo
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
 script_directorio_nombre_stdout () {
-	local source=${BASH_SOURCE[0]}
+	local source
+	source=${BASH_SOURCE[0]}
+	local directorio
 	while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
-	  local directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
+	  directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
 	  source=$(readlink "$source")
 	  [[ $source != /* ]] && source=$directorio/$source # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 	done
 	directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
-	local nombre=$(basename "$source")
-	printf "${directorio}/${nombre}"
+	local nombre
+	nombre=$(basename "$source")
+	echo "$directorio/$nombre"
 }
 
 
@@ -27,15 +31,6 @@ encript_stdout () {
 		return 1
 	fi
 }
-
-
-# --- GENERA Y GUARDA link_args.aes256 ---
-genera_link_args_aes256 () {
-	# $1: password
-	encript_stdout "${_LINK_ARGS}" "$1" > link_args.aes256
-}
-
-
 
 # --- DESENCRIPTA con openssl ---
 # retorna 0/1 si éxito/fracaso: return OK
@@ -60,23 +55,23 @@ debian_dist-upgrade_install () {
 	apt-get -qq update
 	#apt-get -qq -o "Dpkg::Options::=--force-confnew" -o=Dpkg::Use-Pty=0 dist-upgrade
 	#apt-get -o=Dpkg::Use-Pty=0 no parece funcionar, genera output igual
-	printf "ejecutando apt-get upgrade... "
+	echo "ejecutando apt-get upgrade... "
 	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
-		upgrade >/dev/null && printf "Éxito\n"
-	printf "ejecutando apt-get dist-upgrade... "
+		upgrade >/dev/null && echo "Éxito"
+	echo "ejecutando apt-get dist-upgrade... "
 	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
-		dist-upgrade >/dev/null && printf "Éxito\n"
+		dist-upgrade >/dev/null && echo "Éxito"
 	if [ $# -gt 0 ]; then
- 		printf "ejecutando apt-get install $*... "
+ 		echo "ejecutando apt-get install $*... "
    		apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
-			install "$@" >/dev/null && printf "Éxito\n"
+			install "$@" >/dev/null && echo "Éxito"
 	fi
- 	printf "limpiando... "
+ 	echo "limpiando... "
 	apt-get -qq clean
  	apt-get -qq autoclean
-  	apt-get -qq autoremove && printf "Éxito\n"
-   	printf "escribiendo a disco... "
-	sync && printf "Éxito\n"
+  	apt-get -qq autoremove && echo "Éxito"
+   	echo "escribiendo a disco... "
+	sync && echo "Éxito"
 }
 
 
@@ -87,28 +82,29 @@ agregar_usuario_admin () {
 	passwd_nuevo_usuario="$3"
 	ssh_pub_key_nuevo_usuario="$4"
 
-	useradd --uid ${id_nuevo_usuario} \
+	useradd --uid "$id_nuevo_usuario "\
 		--shell /bin/bash \
 		--create-home \
 		--groups sudo,systemd-journal,adm \
-		${nuevo_usuario} \
+		"$nuevo_usuario" \
 		|| return 1
 
 	echo "$nuevo_usuario:$passwd_nuevo_usuario" | chpasswd
 
 	# Para poder hacer ping http://unixetc.co.uk/2016/05/30/linux-capabilities-and-ping/
-	setcap cap_net_raw+p $(which ping)
+	setcap cap_net_raw+p "$(which ping)"
 
 	# crea el archivo de la clave ssh pública del usuario
-	local nuevo_usuario_sshkey_dir="$(eval echo "~${nuevo_usuario}")/.ssh"
+	local nuevo_usuario_sshkey_dir
+	nuevo_usuario_sshkey_dir="$(eval echo "~$nuevo_usuario")/.ssh"
 	mkdir "$nuevo_usuario_sshkey_dir"
-	cat >"$nuevo_usuario_sshkey_dir"/authorized_keys${MARCA} <<-EOF
-		${encabezado}
+	cat >"$nuevo_usuario_sshkey_dir"/authorized_keys"$MARCA" <<-EOF
+		encabezado
 		# http://man.he.net/man5/authorized_keys
 		#
-		${ssh_pub_key_nuevo_usuario}
+		$ssh_pub_key_nuevo_usuario
 	EOF
-	chown --recursive "${nuevo_usuario}:${nuevo_usuario}" "$nuevo_usuario_sshkey_dir"
+	chown --recursive "$nuevo_usuario:$nuevo_usuario" "$nuevo_usuario_sshkey_dir"
 	chmod 600 "$nuevo_usuario_sshkey_dir"/*
 }
 
@@ -117,8 +113,8 @@ agregar_usuario_admin () {
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 verif_privilegios_root () {
-	if (( $EUID != 0 )); then
-		printf "ERROR: Este script se debe ejecutar con privilegios root (printf)\n"
+	if (( EUID != 0 )); then
+		echo "ERROR: Este script se debe ejecutar con privilegios root (echo)"
 		return 1
   	else
    		return 0
