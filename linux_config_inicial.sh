@@ -16,15 +16,6 @@ fi
 # carga de biblioteca de funciones generales
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
-# Opciones para la configuración
-#export LANG=C.utf8 # quedará de forma permamente. Ver: crear_archivo_profile_local ()
-#export TZ='America/Argentina/Buenos_Aires'
-
-# el contenido de la sig variable sirve para appendear a los nombres de los archivos creados por este script
-#MARCA="_panchuz"
-
-# resto de las variables se definen en función principal
-
 
 # GENERACIÓN DEL ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN
 generacion_encabezado_stdout () {
@@ -126,7 +117,7 @@ configuracion_sshd () {
 		#
 		Port $PUERTO_SSHD
 		PermitRootLogin no
-		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys"$MARCA"
+		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys$MARCA
 		PasswordAuthentication no
 	EOF
 	systemctl reload sshd
