@@ -55,22 +55,22 @@ debian_dist-upgrade_install () {
 	apt-get -qq update
 	#apt-get -qq -o "Dpkg::Options::=--force-confnew" -o=Dpkg::Use-Pty=0 dist-upgrade
 	#apt-get -o=Dpkg::Use-Pty=0 no parece funcionar, genera output igual
-	echo "ejecutando apt-get upgrade... "
+	printf "ejecutando apt-get upgrade... "
 	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
 		upgrade >/dev/null && echo "Éxito"
-	echo "ejecutando apt-get dist-upgrade... "
+	printf "ejecutando apt-get dist-upgrade... "
 	apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
 		dist-upgrade >/dev/null && echo "Éxito"
 	if [ $# -gt 0 ]; then
- 		echo "ejecutando apt-get install $*... "
+ 		printf "ejecutando apt-get install $*... "
    		apt-get -qq -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" \
 			install "$@" >/dev/null && echo "Éxito"
 	fi
- 	echo "limpiando... "
+ 	printf "limpiando... "
 	apt-get -qq clean
  	apt-get -qq autoclean
   	apt-get -qq autoremove && echo "Éxito"
-   	echo "escribiendo a disco... "
+   	printf "escribiendo a disco... "
 	sync && echo "Éxito"
 }
 
@@ -82,7 +82,7 @@ agregar_usuario_admin () {
 	passwd_nuevo_usuario="$3"
 	ssh_pub_key_nuevo_usuario="$4"
 
-	useradd --uid "$id_nuevo_usuario "\
+	useradd --uid "$id_nuevo_usuario" \
 		--shell /bin/bash \
 		--create-home \
 		--groups sudo,systemd-journal,adm \

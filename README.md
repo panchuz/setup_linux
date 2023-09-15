@@ -7,9 +7,9 @@ bash -c "$(wget -qLO - https://github.com/panchuz/linux_config_inicial/raw/main/
 
 ## Comando para bajar el .sh y ejecutarlo localmente
 ## no modifica enviroment (e.g.:LANG)
-wget -P /root https://github.com/panchuz/linux_config_inicial/raw/main/linux_config_inicial.sh
+wget -P /root https://github.com/panchuz/linux_config_inicial/raw/main/linux_config_inicial.sh 
 chmod +x /root/linux_config_inicial.sh
-/root/linux_config_inicial.sh
+/root/linux_config_inicial.sh passwd_link_args
 
 ## Comando para bajar el .sh y ejecutarlo como "source"
 wget -qP /root https://github.com/panchuz/linux_config_inicial/raw/main/linux_config_inicial.sh &&
