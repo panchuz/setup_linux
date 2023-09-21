@@ -17,19 +17,6 @@ fi
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 
-# GENERACIÓN DEL ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN
-generacion_encabezado_stdout () {
-	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
-	cat <<-EOF
-		# creado por (BASH_SOURCE):	${BASH_SOURCE[0]}
-		# fecha y hora:	$(date +%F_%T_TZ:%Z)
-		# nombre host:	$(hostname)
-		# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
-		#
-		
-	EOF
-}
-
 # CONFIGURACIÓN LOCAL
 crear_archivo_profile_locale () {
 	cat >/etc/profile.d/profile"$MARCA".sh <<-EOF
@@ -124,8 +111,8 @@ configuracion_sshd () {
 }
 
 
-#------------------FUNCIÓN PRINCIPAL------------------
-principal () {
+#------------------FUNCIÓN main------------------
+main () {
 	passwd_link_args_aes256="$1"
 
 	#carga de argumentos
@@ -138,7 +125,7 @@ principal () {
  
 	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
  	local encabezado
-	encabezado="$(generacion_encabezado_stdout)"
+	encabezado="$(encabezado_stdout)"
   
   	# genera locale $LANG permanente
 	crear_archivo_profile_locale
@@ -182,7 +169,7 @@ principal () {
 # Verificación de privilegios
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( EUID == 0 )); then
-	principal "$passwd_link_args_aes256"
+	main "$passwd_link_args_aes256"
 else
 	echo "ERROR: Este script se debe ejecutar con privilegios root"
 fi

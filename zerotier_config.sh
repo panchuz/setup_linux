@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#passwd_link_args_aes256="$1" # passwd para desencriptar link_args.aes256
+passwd_link_args_aes256="$1" # passwd para desencriptar link_args.aes256
 
 #######################################################################
 #  creado por panchuz                                                 
@@ -8,30 +8,17 @@
 #######################################################################
 
 # verificación de la cantidad de argumentos
-#if [ $# -ne 1 ]; then
-#    echo "Uso: ${BASH_SOURCE[0]} passwd_link_args_aes256"
-#    return 1
-#fi
+if [ $# -ne 1 ]; then
+    echo "Uso: ${BASH_SOURCE[0]} passwd_link_args_aes256"
+    return 1
+fi
 
 # carga de biblioteca de funciones generales
-#source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
-
-# GENERACIÓN DEL ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN
-generacion_encabezado_stdout () {
-	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
-	cat <<-EOF
-		# creado por (BASH_SOURCE):	${BASH_SOURCE[0]}
-		# fecha y hora:	$(date +%F_%T_TZ:%Z)
-		# nombre host:	$(hostname)
-		# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
-		#
-		
-	EOF
-}
 	 
 # CREA DROP-IN PARA ACCESO A LAN FÍSICA DESDE ZEROTIER
-crear_dropin_zerotier () {
+crea_dropin_zerotier () {
 	cat >/etc/systemd/system/zerotier-one.service.d/nat-masq"$MARCA".conf <<-EOF
 		$encabezado
 		#
@@ -61,3 +48,40 @@ crear_dropin_zerotier () {
 		ExecStopPost= /usr/sbin/sysctl -w net.ipv4.ip_forward=0
 	EOF
 }
+
+
+#------------------FUNCIÓN main------------------
+main () {
+	passwd_link_args_aes256="$1"
+
+	#carga de argumentos
+	wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_args.aes256
+	link_args=$(desencript_stdout "$(cat link_args.aes256)" "$passwd_link_args_aes256")
+	source <(wget --quiet -O - --no-check-certificate "$link_args")
+
+	debian_dist-upgrade_install zerotier-one
+
+	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
+ 	local encabezado
+	encabezado="$(encabezado_stdout)"
+
+	crea_dropin_zerotier
+
+ 	# reboot necesario????
+ 	if [ -f /var/run/reboot-required ]; then
+  		echo "Se procede a reiniciar"
+		/bin/sleep 5
+		reboot
+ 	else
+ 		echo "NO se necesita reiniciar"
+  	fi
+}
+
+
+# Verificación de privilegios
+# https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
+if (( EUID == 0 )); then
+	main "$passwd_link_args_aes256"
+else
+	echo "ERROR: Este script se debe ejecutar con privilegios root"
+fi

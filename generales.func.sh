@@ -20,6 +20,20 @@ script_directorio_nombre_stdout () {
 }
 
 
+# --- GENERA ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN ---
+encabezado_stdout () {
+	# https://serverfault.com/questions/72476/clean-way-to-write-complex-multi-line-string-to-a-variable
+	cat <<-EOF
+		# creado por (BASH_SOURCE):	${BASH_SOURCE[0]}
+		# fecha y hora:	$(date +%F_%T_TZ:%Z)
+		# nombre host:	$(hostname)
+		# $(grep -oP '(?<=^PRETTY_NAME=).+' /etc/os-release | tr -d '"') / kernel version $(uname -r)
+		#
+		
+	EOF
+}
+
+
 # --- ENCRIPTA con openssl ---
 # retorna 0/1 si éxito/fracaso
 encript_stdout () {
