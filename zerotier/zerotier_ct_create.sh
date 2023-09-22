@@ -18,15 +18,17 @@ fi
 
 
 pct create $contairner_id local:vztmpl/debian-10-standard_10.7-1_amd64.tar.gz??? \
-	-hostname: zerotier \
+	-hostname zerotier \
 	-description "Zerotier with NAT-Masq access to phisical net" \
-	-cores: 1 \
-	-memory: 512 \
-	-swap: 512 \
+	-cores 1 \
+	-memory 512 \
+	-swap 512 \
 	-net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
 	-storage local-lvm ????? \
 	-unprivileged 1 \
-	#-hookscript: <string>
+	-timezone host \
+	-onboot 1 \
+	#-hookscript <string>
 	#|| return 1
 
 	# the two following lines must be written to .conf file directly
