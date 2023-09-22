@@ -17,16 +17,17 @@ fi
 #source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 
-pct create $contairner_id \
-	local:vztmpl/debian-10-standard_10.7-1_amd64.tar.gz \ ????
-	--unprivileged 1 \
-	--net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
-	--storage local-lvm ?????
-	#cores: 1 
-	#hookscript: <string>
-	|| return 1
-
-#pct set $contairner_id
+pct create $contairner_id local:vztmpl/debian-10-standard_10.7-1_amd64.tar.gz??? \
+	-hostname: zerotier \
+	-description "Zerotier with NAT-Masq access to phisical net" \
+	-cores: 1 \
+	-memory: 512 \
+	-swap: 512 \
+	-net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
+	-storage local-lvm ????? \
+	-unprivileged 1 \
+	#-hookscript: <string>
+	#|| return 1
 
 	# the two following lines must be written to .conf file directly
 	# pct commnad cannot handle them
