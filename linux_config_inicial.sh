@@ -116,9 +116,9 @@ main () {
 	passwd_link_args_aes256="$1"
 
 	#carga de argumentos
-	wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_args.aes256 || exit 1
-	link_args=$(desencript_stdout "$(cat link_args.aes256)" "$passwd_link_args_aes256") || exit 1
-	source <(wget --quiet -O - --no-check-certificate "$link_args") || exit 1
+	wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_args.aes256 || return 1
+	link_args=$(desencript_stdout "$(cat link_args.aes256)" "$passwd_link_args_aes256") || return 1
+	source <(wget --quiet -O - --no-check-certificate "$link_args") || return 1
 
  	# Setea huso horario
 	config_huso_horario
