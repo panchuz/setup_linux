@@ -102,10 +102,31 @@ configuracion_sshd () {
 		$encabezado
 		# http://man.he.net/man5/sshd_config
 		#
-		Port $PUERTO_SSHD
+		# WARNING: As of openssh-server 1:9.0 the Port setting below in ONLY
+		# honored when sshd gets reloaded (sudo systemctl reload sshd), NOT when
+		# system starts. Te sets the initial listening port for sshd use 
+		# /etc/systemd/system/ssh.socket.d/sshd.socket"$MARCA".conf
+		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189
+		# 
+		Port $SSHD_PORT
 		PermitRootLogin no
 		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys$MARCA
 		PasswordAuthentication no
+	EOF
+	
+	mkdir -p /etc/systemd/system/ssh.socket.d
+	cat >/etc/systemd/system/ssh.socket.d/sshd.socket"$MARCA".conf <<EOF
+		$encabezado
+		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189/7
+		#
+		# WARNING: the Port setting below in ONLY honored from boot and UNTIL
+		# sshd gets reloaded (sudo systemctl reload sshd).
+		# Once relaoded, sshd listens on the port set in
+		# /etc/ssh/sshd_config.d/sshd_config"$MARCA".conf
+		#
+		[Socket]
+		ListenStream=
+		ListenStream=$SSHD_PORT
 	EOF
 	systemctl reload sshd
 }
@@ -153,7 +174,7 @@ main () {
 	fi
 
 	# configuración sshd: puerto y agrega autorizedkeys con MARCA
-	# usa vars globales: encabezado, MARCA y PUERTO_SSHD
+	# usa vars globales: encabezado, MARCA y SSHD_PORT
 	configuracion_sshd
 
  	# reboot necesario????
