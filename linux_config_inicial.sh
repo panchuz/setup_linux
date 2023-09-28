@@ -96,7 +96,7 @@ config_unattended-upgrades_prueba_mail () {
 
 
 # --- CONFIGURACIÓN sshd ---
-configuracion_sshd () {
+sshd_configuration () {
 
 	cat >/etc/ssh/sshd_config.d/sshd_config"$MARCA".conf <<-EOF
 		$encabezado
@@ -115,7 +115,7 @@ configuracion_sshd () {
 	EOF
 	
 	mkdir -p /etc/systemd/system/ssh.socket.d
-	cat >/etc/systemd/system/ssh.socket.d/sshd.socket"$MARCA".conf <<EOF
+	cat >/etc/systemd/system/ssh.socket.d/sshd.socket"$MARCA".conf <<-EOF
 		$encabezado
 		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189/7
 		#
@@ -175,7 +175,7 @@ main () {
 
 	# configuración sshd: puerto y agrega autorizedkeys con MARCA
 	# usa vars globales: encabezado, MARCA y SSHD_PORT
-	configuracion_sshd
+	sshd_configuration
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
