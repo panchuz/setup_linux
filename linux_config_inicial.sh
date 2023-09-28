@@ -19,7 +19,7 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_confi
 
 # CONFIGURACIÓN LOCAL
 crear_archivo_profile_locale () {
-	cat >/etc/profile.d/profile"$MARCA".sh <<-EOF
+	cat >/etc/profile.d/profile"$MARK".sh <<-EOF
 		$encabezado
 		# https://wiki.debian.org/Locale#Standard
 		# https://www.debian.org/doc/manuals/debian-reference/ch08.en.html#_rationale_for_utf_8_locale
@@ -54,7 +54,7 @@ config_postfix_nullclient_gmail () {
 	chmod 0600 /etc/postfix/sasl/sasl_passwd*
 	
 	# backup de la configuración original
-	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL"$MARCA"
+	cp /etc/postfix/main.cf /etc/postfix/main.cf.ORIGINAL"$MARK"
 	
 	# configuración postfix >> /etc/postfix/main.cf
 	# smtp_generic_maps mapea usuarios locales a direcciones de mail
@@ -77,7 +77,7 @@ config_postfix_nullclient_gmail () {
 # --- CONFIGURACIÓN unattended-upgrades PRUEBA MAIL ---
 config_unattended-upgrades_prueba_mail () {
 
-	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARCA" <<-EOF
+	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARK" <<-EOF
 		Unattended-Upgrade::Mail "root";
 		Unattended-Upgrade::MailReport "always"; /* SOLO PARA PROBAR */
 	EOF
@@ -85,7 +85,7 @@ config_unattended-upgrades_prueba_mail () {
 	unattended-upgrade && echo "Checkear recepción de mail de unattended-upgrades"
 
 	# ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
-	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARCA" <<-EOF
+	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARK" <<-EOF
 		${encabezado//\#///}
 		// https://wiki.debian.org/UnattendedUpgrades#Unattended_Upgrades
 		// 
@@ -98,37 +98,55 @@ config_unattended-upgrades_prueba_mail () {
 # --- CONFIGURACIÓN sshd ---
 sshd_configuration () {
 
-	cat >/etc/ssh/sshd_config.d/sshd_config"$MARCA".conf <<-EOF
+	cat >/etc/ssh/sshd_config.d/sshd_config"$MARK".conf <<-EOF
 		$encabezado
 		# http://man.he.net/man5/sshd_config
-		#
-		# WARNING: As of openssh-server 1:9.0 the Port setting below in ONLY
-		# honored when sshd gets reloaded (sudo systemctl reload sshd), NOT when
-		# system starts. Te sets the initial listening port for sshd use 
-		# /etc/systemd/system/ssh.socket.d/sshd.socket"$MARCA".conf
 		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189
-		# 
+		#
+		# WARNING: As of openssh-server 1:9.0, sshd has socket-based activation
+		# => the Port setting below in ONLY honored after (and if) it gets
+		# reloaded, NOT at startup. The initial listening port is set at 
+		# /etc/systemd/system/ssh.socket.d/sshd.socket"$MARK".conf
+		#
+		# If both -service and socket- config files point to the same port,
+		# sshd reload will cause a "port already in use" ERROR, STOPPING sshd.
+		# Hence: /etc/systemd/system/ssh.service.d/sshd.service"$MARK".conf
+		#
 		Port $SSHD_PORT
 		PermitRootLogin no
-		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys$MARCA
+		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys$MARK
 		PasswordAuthentication no
 	EOF
 	
 	mkdir -p /etc/systemd/system/ssh.socket.d
-	cat >/etc/systemd/system/ssh.socket.d/sshd.socket"$MARCA".conf <<-EOF
+	cat >/etc/systemd/system/ssh.socket.d/sshd.socket"$MARK".conf <<-EOF
 		$encabezado
 		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189/7
 		#
 		# WARNING: the Port setting below in ONLY honored from boot and UNTIL
-		# sshd gets reloaded (sudo systemctl reload sshd).
-		# Once relaoded, sshd listens on the port set in
-		# /etc/ssh/sshd_config.d/sshd_config"$MARCA".conf
+		# sshd gets reloaded. Once relaoded, sshd listens on the port set in
+		# /etc/ssh/sshd_config.d/sshd_config"$MARK".conf
 		#
 		[Socket]
 		ListenStream=
 		ListenStream=$SSHD_PORT
 	EOF
-	systemctl reload sshd
+
+	mkdir -p /etc/systemd/system/ssh.service.d
+	cat >/etc/systemd/system/ssh.service.d/sshd.service"$MARK".conf <<-EOF
+		$encabezado
+		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189/7
+		#
+		# WARNING: the goal of this conf file is to prevents sshd form
+		# getting reloaded (systemctl reload sshd).
+		# Why? Because it generates a "port already in use" ERROR
+		# between ssh.socket and ssh.service, STOPPING sshd.
+		#
+		[Service]
+		ExecReload=
+	EOF
+	
+	systemctl restart sshd
 }
 
 
@@ -173,8 +191,8 @@ main () {
 		agregar_usuario_admin "$NUEVO_USUARIO" "$ID_NUEVO_USUARIO" "$passwd_link_args_aes256" "$SSH_PUB_KEY_NUEVO_USUARIO"
 	fi
 
-	# configuración sshd: puerto y agrega autorizedkeys con MARCA
-	# usa vars globales: encabezado, MARCA y SSHD_PORT
+	# configuración sshd: puerto y agrega autorizedkeys con MARK
+	# usa vars globales: encabezado, MARK y SSHD_PORT
 	sshd_configuration
 
  	# reboot necesario????

@@ -19,7 +19,7 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_confi
 	 
 # CREA DROP-IN PARA ACCESO A LAN FÍSICA DESDE ZEROTIER
 crea_dropin_zerotier () {
-	cat >/etc/systemd/system/zerotier-one.service.d/nat-masq"$MARCA".conf <<-EOF
+	cat >/etc/systemd/system/zerotier-one.service.d/nat-masq"$MARK".conf <<-EOF
 		$encabezado
 		#
 		# Unit file original en /usr/lib/systemd/system/zerotier-one.service

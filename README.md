@@ -21,7 +21,7 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_confi
 ### Formato del archivo de Argumentos para linux_config_inicial.sh
 ```
 #variable=contenido
-MARCA="_marca"
+MARK="_marca"
 LANG="C.utf8"
 TZ="America/Argentina/Buenos_Aires"
 CUENTA_GOOGLE=cuenta

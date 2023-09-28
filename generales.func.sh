@@ -112,7 +112,7 @@ agregar_usuario_admin () {
 	local nuevo_usuario_sshkey_dir
 	nuevo_usuario_sshkey_dir="$(eval echo "~$nuevo_usuario")/.ssh"
 	mkdir "$nuevo_usuario_sshkey_dir"
-	cat >"$nuevo_usuario_sshkey_dir"/authorized_keys"$MARCA" <<-EOF
+	cat >"$nuevo_usuario_sshkey_dir"/authorized_keys"$MARK" <<-EOF
 		encabezado
 		# http://man.he.net/man5/authorized_keys
 		#
