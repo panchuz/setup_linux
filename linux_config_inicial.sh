@@ -117,7 +117,13 @@ sshd_configuration () {
 		AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2 .ssh/authorized_keys$MARK
 		PasswordAuthentication no
 	EOF
-	
+
+	systemctl stop ssh.socket
+	# reload ssh.service to load the new config file without interrupting open connections
+	# ssh.socket is stoped before, to avoid port usage conflict
+	systemctl reload ssh.service
+
+	# now we create drop-ins for ssh.{socket,service} and loads them
 	mkdir -p /etc/systemd/system/ssh.socket.d
 	cat >/etc/systemd/system/ssh.socket.d/sshd.socket"$MARK".conf <<-EOF
 		$encabezado
@@ -146,7 +152,9 @@ sshd_configuration () {
 		ExecReload=
 	EOF
 	
-	systemctl restart sshd
+	
+	systemctl daemon-reload
+	systemctl start ssh.socket
 }
 
 
