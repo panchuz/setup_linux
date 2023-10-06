@@ -118,10 +118,10 @@ sshd_configuration () {
 		PasswordAuthentication no
 	EOF
 
-	systemctl stop ssh.socket
+	#systemctl stop ssh.socket
 	# reload ssh.service to load the new config file without interrupting open connections
 	# ssh.socket is stoped before, to avoid port usage conflict
-	systemctl reload ssh.service
+	#systemctl reload ssh.service
 
 	# now we create drop-ins for ssh.{socket,service} and loads them
 	mkdir -p /etc/systemd/system/ssh.socket.d
@@ -138,9 +138,9 @@ sshd_configuration () {
 		ListenStream=$SSHD_PORT
 	EOF
 
-	mkdir -p /etc/systemd/system/ssh.service.d
-	cat >/etc/systemd/system/ssh.service.d/sshd.service"$MARK".conf <<-EOF
-		$encabezado
+	#mkdir -p /etc/systemd/system/ssh.service.d
+	#cat >/etc/systemd/system/ssh.service.d/sshd.service"$MARK".conf <<-EOF
+	#	$encabezado
 		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189/7
 		#
 		# WARNING: the goal of this conf file is to prevents sshd form
@@ -148,9 +148,9 @@ sshd_configuration () {
 		# Why? Because it generates a "port already in use" ERROR
 		# between ssh.socket and ssh.service, STOPPING sshd.
 		#
-		[Service]
-		ExecReload=
-	EOF
+	#	[Service]
+	#	ExecReload=
+	#EOF
 	
 	
 	systemctl daemon-reload
