@@ -154,7 +154,7 @@ sshd_configuration () {
 	
 	
 	systemctl daemon-reload
-	systemctl start ssh.socket
+	systemctl restart ssh.socket
 }
 
 
