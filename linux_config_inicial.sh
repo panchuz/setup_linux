@@ -48,7 +48,7 @@ config_postfix_nullclient_gmail () {
 		$encabezado
 		# https://www.lynksthings.com/posts/sysadmin/mailserver-postfix-gmail-relay/
 		#
-		[smtp.gmail.com]:587 ${CUENTA_GOOGLE}@gmail.com:$GMAIL_APP_PASSWD
+		[smtp.gmail.com]:587 ${GOOGLE_ACCOUNT}@gmail.com:$GMAIL_APP_PASSWD
 	EOF
 	postmap /etc/postfix/sasl/sasl_passwd
 	chmod 0600 /etc/postfix/sasl/sasl_passwd*
@@ -68,7 +68,7 @@ config_postfix_nullclient_gmail () {
 		'smtp_sasl_security_options = noanonymous' \
 		'smtp_sasl_auth_enable = yes' \
 		'smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd' \
-		"smtp_generic_maps = pcre:{{/(.*)@\$myorigin/ $CUENTA_GOOGLE+\$\${1}%$(hostname)@gmail.com}}" \
+		"smtp_generic_maps = pcre:{{/(.*)@\$myorigin/ $GOOGLE_ACCOUNT+\$\${1}%$(hostname)@gmail.com}}" \
 		"smtp_header_checks = pcre:{{/^From:.*/ REPLACE From: $(hostname) <myorigin-@-\$myorigin>}}"
 	systemctl start postfix
 }
@@ -79,10 +79,10 @@ config_unattended-upgrades_prueba_mail () {
 
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARK" <<-EOF
 		Unattended-Upgrade::Mail "root";
-		Unattended-Upgrade::MailReport "always"; /* SOLO PARA PROBAR */
+		Unattended-Upgrade::MailReport "always"; /* ONLY FOR TESTING PURPOSES */
 	EOF
 
-	unattended-upgrade && echo "Checkear recepción de mail de unattended-upgrades"
+	unattended-upgrade && echo "Check unattended-upgrades mail reception in ${GOOGLE_ACCOUNT}@gmail.com"
 
 	# ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARK" <<-EOF
@@ -164,19 +164,19 @@ main () {
 	##### rsyslog: https://itslinuxfoss.com/find-postfix-log-files/
 
 	# configurar postfix como nullclient/smtp de gmail/no-FQDN:
-	# usa $CUENTA_GOOGLE y $GMAIL_APP_PASSWD
+	# usa $GOOGLE_ACCOUNT y $GMAIL_APP_PASSWD
 	config_postfix_nullclient_gmail
  
  	# configurar uanttended-upgrades
 	config_unattended-upgrades_prueba_mail
 
 	# agregado usuario panchuz
-	# usa vars globales:  NUEVO_USUARIO, ID_NUEVO_USUARIO y SSH_PUB_KEY_NUEVO_USUARIO
-	# si no se proporcionó PASSWD_NUEVO_USUARIO, se usa passwd_link_args_aes256 en su lugar
-	if [ -n "$PASSWD_NUEVO_USUARIO" ]; then
-		agregar_usuario_admin "$NUEVO_USUARIO" "$ID_NUEVO_USUARIO" "$PASSWD_NUEVO_USUARIO" "$SSH_PUB_KEY_NUEVO_USUARIO"
+	# usa vars globales:  ADMIN_USER, ID_ADMIN_USER y SSH_PUB_KEY_ADMIN_USER
+	# si no se proporcionó ADMIN_USER_PASSWD, se usa passwd_link_args_aes256 en su lugar
+	if [ -n "$ADMIN_USER_PASSWD" ]; then
+		agregar_usuario_admin "$ADMIN_USER" "$ID_ADMIN_USER" "$ADMIN_USER_PASSWD" "$SSH_PUB_KEY_ADMIN_USER"
 	else
-		agregar_usuario_admin "$NUEVO_USUARIO" "$ID_NUEVO_USUARIO" "$passwd_link_args_aes256" "$SSH_PUB_KEY_NUEVO_USUARIO"
+		agregar_usuario_admin "$ADMIN_USER" "$ID_ADMIN_USER" "$passwd_link_args_aes256" "$SSH_PUB_KEY_ADMIN_USER"
 	fi
 
 	# configuración sshd: puerto y agrega autorizedkeys con MARK
@@ -185,15 +185,15 @@ main () {
 
  	# reboot necesario????
  	if [ -f /var/run/reboot-required ]; then
-  		echo "Se procede a reiniciar"
-		/bin/sleep 5
-		reboot
+  		echo "--- REBOOT REQUIERD ---"
+	#	/bin/sleep 5
+	#	reboot
  	else
- 		echo "NO se necesita reiniciar"
+ 		echo "Reboot NOT requierd"
   	fi
 }
 
-# Verificación de privilegios
+# Root privileges verification
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( EUID == 0 )); then
 	main "$passwd_link_args_aes256"

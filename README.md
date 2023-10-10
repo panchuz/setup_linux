@@ -23,14 +23,14 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_confi
 
 ### Formato del archivo de Argumentos para linux_config_inicial.sh
 ```
-#variable=contenido
-MARK="_marca"
+#variable_name=variable_content
+MARK="_mark"
 LANG="C.utf8"
 TZ="America/Argentina/Buenos_Aires"
-CUENTA_GOOGLE=cuenta
+GOOGLE_ACCOUNT=account_name
 GMAIL_APP_PASSWD=abcdefghijklmnop
 SSHD_PORT=12345
-NUEVO_USUARIO=alguien
-PASSWD_NUEVO_USUARIO=
-SSH_PUBLIC_KEY="tipo key cometario"
+ADMIN_USER=anyone
+ADMIN_USER_PASSWD=
+SSH_PUBLIC_KEY="key-type key comment"
 ```
