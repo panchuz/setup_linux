@@ -98,7 +98,7 @@ config_unattended-upgrades_prueba_mail () {
 # --- CONFIGURACIÓN sshd ---
 sshd_configuration () {
 
-	cat >/etc/ssh/sshd_config.d/sshd_config"$MARK".conf <<-EOF
+	cat >/etc/ssh/sshd_config.d/10access"$MARK".conf <<-EOF
 		$encabezado
 		# http://man.he.net/man5/sshd_config
 		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189
@@ -106,11 +106,7 @@ sshd_configuration () {
 		# WARNING: As of openssh-server 1:9.0, sshd has socket-based activation
 		# => the Port setting below in ONLY honored after (and if) it gets
 		# reloaded, NOT at startup. The initial listening port is set at 
-		# /etc/systemd/system/ssh.socket.d/sshd.socket"$MARK".conf
-		#
-		# If both -service and socket- config files point to the same port,
-		# sshd reload will cause a "port already in use" ERROR, STOPPING sshd.
-		# Hence: /etc/systemd/system/ssh.service.d/sshd.service"$MARK".conf
+		# /etc/systemd/system/ssh.socket.d/*.conf
 		#
 		Port $SSHD_PORT
 		PermitRootLogin no
@@ -118,43 +114,27 @@ sshd_configuration () {
 		PasswordAuthentication no
 	EOF
 
-	#systemctl stop ssh.socket
-	# reload ssh.service to load the new config file without interrupting open connections
-	# ssh.socket is stoped before, to avoid port usage conflict
-	#systemctl reload ssh.service
-
 	# now we create drop-ins for ssh.{socket,service} and loads them
 	mkdir -p /etc/systemd/system/ssh.socket.d
-	cat >/etc/systemd/system/ssh.socket.d/sshd.socket"$MARK".conf <<-EOF
+	cat >/etc/systemd/system/ssh.socket.d/10ListenStream"$MARK".conf <<-EOF
 		$encabezado
 		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189/7
 		#
 		# WARNING: the Port setting below in ONLY honored from boot and UNTIL
 		# sshd gets reloaded. Once relaoded, sshd listens on the port set in
-		# /etc/ssh/sshd_config.d/sshd_config"$MARK".conf
+		# /etc/ssh/sshd_config.d/*.conf
 		#
 		[Socket]
 		ListenStream=
 		ListenStream=$SSHD_PORT
 	EOF
 
-	#mkdir -p /etc/systemd/system/ssh.service.d
-	#cat >/etc/systemd/system/ssh.service.d/sshd.service"$MARK".conf <<-EOF
-	#	$encabezado
-		# https://discourse.ubuntu.com/t/sshd-now-uses-socket-based-activation-ubuntu-22-10-and-later/30189/7
-		#
-		# WARNING: the goal of this conf file is to prevents sshd form
-		# getting reloaded (systemctl reload sshd).
-		# Why? Because it generates a "port already in use" ERROR
-		# between ssh.socket and ssh.service, STOPPING sshd.
-		#
-	#	[Service]
-	#	ExecReload=
-	#EOF
-	
-	
+	# ssh.socket is stoped before reloading systemd units to avoid port usage conflict
+	#systemctl stop ssh.socket
 	systemctl daemon-reload
-	systemctl restart ssh.socket
+
+	# reload ssh.service to load the new config file without interrupting open connections
+	systemctl reload ssh.service
 }
 
 
