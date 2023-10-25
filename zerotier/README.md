@@ -1,3 +1,9 @@
+
+## Ejecutar script de creación de CT zerotier
+```
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/zerotier/zerotier_ct_create.sh) 200
+```
+
 panchuz@zt:~$ sudo nft list ruleset
 table inet filter {
         chain input {
