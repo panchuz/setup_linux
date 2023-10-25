@@ -26,14 +26,12 @@ fi
 pct create $ct_id "$ct_template" \
 	--hostname zerotier \
 	--description "Zerotier with NAT-Masq access to phisical net" \
-	--tags deb12 zerotier \
-	--ostype debian \
+	--tags deb12,zerotier \
 	--protection 1 \
 	--cores 1 \
 	--memory 512 \
 	--swap 512 \
 	--net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
-	--storage $ct_storage \
 	--rootfs $ct_storage:$ct_storage_size \
 	--unprivileged 1 \
 	--onboot 1 \
