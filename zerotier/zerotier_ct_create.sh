@@ -23,7 +23,7 @@ fi
 #source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 
-pct create $ct_id_id $template_storage:vztmpl/debian-12-standard_12.0-1_amd64.tar.gz \
+pct create $ct_id $template_storage:vztmpl/debian-12-standard_12.0-1_amd64.tar.gz \
 	--hostname zerotier \
 	--description "Zerotier with NAT-Masq access to phisical net" \
 	--tags deb12 zerotier \
@@ -39,9 +39,9 @@ pct create $ct_id_id $template_storage:vztmpl/debian-12-standard_12.0-1_amd64.ta
 	--onboot 1 \
 	--password="$ct_rootpasswd" \
 	--timezone host \
+	|| return 1
 	#--rootfs volume=$ct_storage,mountoptions=nodatacow;autodefrag;noatime;lazytime,size=2 \
 	#--hookscript <string> Script that will be exectued during various steps in the containers lifetime.
-	#|| return 1
 
 # the two following lines must be written to .conf file directly
 # pct commnad cannot handle them
