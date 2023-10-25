@@ -8,7 +8,7 @@ ct_id="$1" # passwd para desencriptar link_args.aes256
 #######################################################################
 
 # testing configuration for peludo
-template_storage=cola
+ct_template="/mnt/cola/@pve-storage/template/cache/debian-12-standard_12.0-1_amd64.tar.zst"
 ct_storage=cola
 ct_storage_size=2
 ct_rootpasswd="pancho00"
@@ -23,7 +23,7 @@ fi
 #source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 
-pct create $ct_id $template_storage:vztmpl/debian-12-standard_12.0-1_amd64.tar.gz \
+pct create $ct_id $ct_template \
 	--hostname zerotier \
 	--description "Zerotier with NAT-Masq access to phisical net" \
 	--tags deb12 zerotier \
