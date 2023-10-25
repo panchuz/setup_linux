@@ -23,7 +23,7 @@ fi
 #source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
 
 
-pct create $ct_id $ct_template \
+pct create $ct_id "$ct_template" \
 	--hostname zerotier \
 	--description "Zerotier with NAT-Masq access to phisical net" \
 	--tags deb12 zerotier \
@@ -38,8 +38,7 @@ pct create $ct_id $ct_template \
 	--unprivileged 1 \
 	--onboot 1 \
 	--password="$ct_rootpasswd" \
-	--timezone host \
-	|| return 1
+	--timezone host || exit 1
 	#--rootfs volume=$ct_storage,mountoptions=nodatacow;autodefrag;noatime;lazytime,size=2 \
 	#--hookscript <string> Script that will be exectued during various steps in the containers lifetime.
 
