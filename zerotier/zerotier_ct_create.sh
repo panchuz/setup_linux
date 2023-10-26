@@ -9,8 +9,10 @@ ct_id="$1" # new container´s ID
 
 # testing configuration for peludo
 #ct_template="/mnt/cola/@pve-storage/template/cache/debian-12-standard_12.0-1_amd64.tar.zst"
-ct_template="cola:vztmpl/debian-12-standard_12.0-1_amd64.tar.zst"
-ct_rootfsstorage=cola
+
+### para quirquincho ###
+ct_template="cueva:vztmpl/debian-12-standard_12.0-1_amd64.tar.zst"
+ct_rootfsstorage=pozo
 ct_rootfssize=2
 ct_rootpasswd="pancho00"
 ct_architecture=$(dpkg --print-architecture)
