@@ -13,7 +13,7 @@ ct_template="cola:vztmpl/debian-12-standard_12.0-1_amd64.tar.zst"
 ct_rootfsstorage=cola
 ct_rootfssize=2
 ct_rootpasswd="pancho00"
-ct_architecture=$(dpkg --print-architecture))
+ct_architecture=$(dpkg --print-architecture)
 
 
 # checking the number of arguments
