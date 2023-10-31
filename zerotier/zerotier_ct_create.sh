@@ -57,3 +57,7 @@ cat <<-EOF >>/etc/pve/lxc/$ct_id.conf
 EOF
 
 chown 100000:100000 /dev/net/tun
+
+pct start "$ct_id" || exit "ERROR: Could not start new container"
+
+#  lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/tteck/Proxmox/main/install/$var_install.sh)" || exit
