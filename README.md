@@ -26,9 +26,9 @@ wget -qP /root https://github.com/panchuz/linux_config_inicial/raw/main/linux_co
 source /root/linux_config_inicial.sh passwd_link_args
 ```
 
-## Cargar funciones generales.func.sh
+## Cargar funciones general.func.sh
 ```
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/general.func.sh)
 ```
 
 ### Formato del archivo de Argumentos para linux_config_inicial.sh

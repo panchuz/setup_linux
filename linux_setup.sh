@@ -14,7 +14,7 @@ if [ $# -ne 1 ]; then
 fi
 
 # carga de biblioteca de funciones generales
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/generales.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/general.func.sh)
 
 
 # CONFIGURACIÓN LOCAL
@@ -142,11 +142,10 @@ sshd_configuration () {
 main () {
 	passwd_link_args_aes256="$1"
 
-	# load setup arguments for the new ct/vm
-	load_setup_arguments
-	source <(wget --quiet -O - --no-check-certificate "$link_args") || return 1
-
- 	# Setea huso horario
+	# Load setup variables for the new ct/vm
+	linux_setup_vars
+	
+ 	# Set time zone
 	config_huso_horario
  
 	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script

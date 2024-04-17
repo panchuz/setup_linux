@@ -20,7 +20,7 @@ script_directorio_nombre_stdout () {
 }
 
 # --- Loads setup arguments in /root/.setup_arguments.sh ---
-load_setup_arguments () {
+linux_setup_vars () {
 	source /root/.initial_setup.vars.sh
 }
 
@@ -40,32 +40,11 @@ encabezado_stdout () {
 }
 
 
-# --- ENCRIPTA con openssl ---
-# retorna 0/1 si éxito/fracaso
-encript_stdout () {
-	# $1: cosa a encriptar
-	# $2: password
-	if [ $# -eq 2 ]; then
-		echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:"$2";
-	else
-		return 1
-	fi
-}
-
-# --- DESENCRIPTA con openssl ---
-# retorna 0/1 si éxito/fracaso: return OK
-desencript_stdout () {
-	# $1: cosa encriptada
-	# $2: password
-	echo "$1" | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:"$2"
-}
-
-
 # apt-get update and upgrade automate and unattended
 # https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
 # https://devicetests.com/silence-apt-get-install-output
 # https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
-debian_dist-upgrade_install () {
+debian_dist_upgrade_install () {
 	## argumentos: paquetes a instalar luego del dist-upgrade
 	# se comentó la sig línea para evitar el reinicio automático
 	#export NEEDRESTART_MODE=a
