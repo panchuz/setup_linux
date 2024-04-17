@@ -19,6 +19,12 @@ script_directorio_nombre_stdout () {
 	echo "$directorio/$nombre"
 }
 
+# --- Loads setup arguments in /root/.setup_arguments.sh ---
+load_setup_arguments () {
+	source /root/.setup_arguments.sh
+}
+
+
 
 # --- GENERA ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN ---
 encabezado_stdout () {

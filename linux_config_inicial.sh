@@ -142,9 +142,8 @@ sshd_configuration () {
 main () {
 	passwd_link_args_aes256="$1"
 
-	#carga de argumentos
-	wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_args.aes256 || return 1
-	link_args=$(desencript_stdout "$(cat link_args.aes256)" "$passwd_link_args_aes256") || return 1
+	# load setup arguments for the new ct/vm
+	load_setup_arguments
 	source <(wget --quiet -O - --no-check-certificate "$link_args") || return 1
 
  	# Setea huso horario
