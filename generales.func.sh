@@ -21,7 +21,7 @@ script_directorio_nombre_stdout () {
 
 # --- Loads setup arguments in /root/.setup_arguments.sh ---
 load_setup_arguments () {
-	source /root/.setup_arguments.sh
+	source /root/.initial_setup.vars.sh
 }
 
 
