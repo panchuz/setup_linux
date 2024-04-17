@@ -14,7 +14,7 @@ if [ $# -ne 1 ]; then
 fi
 
 # carga de biblioteca de funciones generales
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/general.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
 
 
 # CONFIGURACIÓN LOCAL

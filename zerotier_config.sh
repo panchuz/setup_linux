@@ -14,7 +14,7 @@ if [ $# -ne 1 ]; then
 fi
 
 # carga de biblioteca de funciones generales
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_config_inicial/main/general.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
 
 	 
 # CREA DROP-IN PARA ACCESO A LAN FÍSICA DESDE ZEROTIER
@@ -55,7 +55,7 @@ main () {
 	passwd_link_args_aes256="$1"
 
 	#carga de argumentos
-	wget --quiet https://github.com/panchuz/linux_config_inicial/raw/main/link_args.aes256
+	wget --quiet https://github.com/panchuz/linux_setup/raw/main/link_args.aes256
 	link_args=$(desencript_stdout "$(cat link_args.aes256)" "$passwd_link_args_aes256")
 	source <(wget --quiet -O - --no-check-certificate "$link_args")
 
