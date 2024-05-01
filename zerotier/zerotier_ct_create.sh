@@ -6,10 +6,11 @@ ct_id="$1" # new container´s ID
 #  creation of zerotier lxc container
 #######################################################################
 
-# carga de biblioteca de funciones generales
+# loads funcions
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
 
-source linux_setup_vars
+# loads variables
+linux_setup_vars
 
 # checking the number of arguments
 if [ $# -ne 1 ]; then
@@ -36,7 +37,7 @@ pct create $ct_id "$ct_template" \
 	--protection 1 \
 	--unprivileged 1 \
 	--timezone host \
-	|| exit 1
+	|| return 1
 	#--hookscript <string> Script that will be exectued during various steps in the containers lifetime.
 
 # the two following lines must be written to .conf file directly
