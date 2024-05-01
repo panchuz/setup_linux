@@ -18,6 +18,10 @@ if [ $# -ne 1 ]; then
     return 1
 fi
 
+# Ref: https://pve.proxmox.com/pve-docs/chapter-pvesm.html#_storage_configuration
+# We need to allocate with size=0 to use subvol, because btrfs quotas are no implemented.
+pvesm alloc $ct_rootfsstorage $ct_id '' 0 --format subvol
+
 # https://forum.proxmox.com/threads/how-to-create-a-container-from-command-line-pct-create.107304/
 # root@pve1:~# pct create 117 /mnt/pve/cephfs/template/cache/jammy-minimal-cloudimg-amd64-root.tar.xz
 # 	--hostname gal1 --memory 1024 --net0 name=eth0,bridge=vmbr0,firewall=1,gw=192.168.10.1,ip=192.168.10.71/24,tag=10,type=veth --storage localblock --rootfs volume=localblock:vm-117-disk-0,mountoptions=noatime,size=8G --unprivileged 1 --pool Containers
@@ -30,7 +34,7 @@ pct create $ct_id "$ct_template" \
 	--memory 512 \
 	--swap 512 \
 	--cores 1 \
-	--rootfs $ct_rootfsstorage:$ct_rootfssize,mountoptions="noatime;lazytime",acl=0 \
+	--rootfs $ct_rootfsstorage:$ct_rootfssize,mountoptions="noatime;lazytime" \
 	--net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
 	--onboot 1 \
 	--arch $ct_architecture \
