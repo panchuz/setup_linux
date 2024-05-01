@@ -30,12 +30,13 @@ pct create $ct_id "$ct_template" \
 	--memory 512 \
 	--swap 512 \
 	--cores 1 \
-	--rootfs $ct_rootfsstorage:$ct_rootfssize,mountoptions="noatime;lazytime" \
+	--rootfs $ct_rootfsstorage:$ct_rootfssize,mountoptions="noatime;lazytime",acl=0 \
 	--net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
 	--onboot 1 \
 	--arch $ct_architecture \
 	--protection 1 \
 	--unprivileged 1 \
+ 	--features nesting=1 \
 	--timezone host \
 	|| return 1
 	#--hookscript <string> Script that will be exectued during various steps in the containers lifetime.
@@ -49,6 +50,6 @@ EOF
 
 chown 100000:100000 /dev/net/tun
 
-pct start "$ct_id" || exit "ERROR: Could not start new container"
+pct start "$ct_id" || return 1
 
 #  lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/tteck/Proxmox/main/install/$var_install.sh)" || exit
