@@ -2,30 +2,20 @@
 ct_id="$1" # new container´s ID
 
 #######################################################################
-#  creado por panchuz                                                 
-#  para automatizar la creación de un lxc container con zerotier   
-#  desde la consola de Proxmox VE  
+#  by panchuz                                                 
+#  creation of zerotier lxc container
 #######################################################################
 
-# testing configuration for peludo
-#ct_template="/mnt/cola/@pve-storage/template/cache/debian-12-standard_12.0-1_amd64.tar.zst"
+# carga de biblioteca de funciones generales
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
 
-### para quirquincho ###
-ct_template="cueva:vztmpl/debian-12-standard_12.0-1_amd64.tar.zst"
-ct_rootfsstorage=pozo
-ct_rootfssize=2
-ct_rootpasswd="pancho00"
-ct_architecture=$(dpkg --print-architecture)
-
+source linux_setup_vars
 
 # checking the number of arguments
 if [ $# -ne 1 ]; then
     echo "Uso: ${BASH_SOURCE[0]} ct_id"
     return 1
 fi
-
-# carga de biblioteca de funciones generales
-#source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
 
 # https://forum.proxmox.com/threads/how-to-create-a-container-from-command-line-pct-create.107304/
 # root@pve1:~# pct create 117 /mnt/pve/cephfs/template/cache/jammy-minimal-cloudimg-amd64-root.tar.xz
