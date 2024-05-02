@@ -23,9 +23,8 @@ fi
 pvesm alloc $ct_rootfsstorage $ct_id '' 0 --format subvol
 
 # https://forum.proxmox.com/threads/how-to-create-a-container-from-command-line-pct-create.107304/
-# root@pve1:~# pct create 117 /mnt/pve/cephfs/template/cache/jammy-minimal-cloudimg-amd64-root.tar.xz
-# 	--hostname gal1 --memory 1024 --net0 name=eth0,bridge=vmbr0,firewall=1,gw=192.168.10.1,ip=192.168.10.71/24,tag=10,type=veth --storage localblock --rootfs volume=localblock:vm-117-disk-0,mountoptions=noatime,size=8G --unprivileged 1 --pool Containers
-# unable to create CT 117 - no such logical volume pve/vm-117-disk-0
+# pct create 117 /mnt/pve/cephfs/template/cache/jammy-minimal-cloudimg-amd64-root.tar.xz --hostname gal1 --memory 1024 --net0 name=eth0,bridge=vmbr0,firewall=1,gw=192.168.10.1,ip=192.168.10.71/24,tag=10,type=veth --storage localb
+# lock --rootfs localblock:8 --unprivileged 1 --pool Containers --ignore-unpack-errors --ssh-public-keys /root/.ssh/authorized_keys --ostype ubuntu --password="$ROOTPASS" --start 1
 pct create $ct_id "$ct_template" \
 	--hostname zerotier \
 	--description "Zerotier with NAT-Masq access to phisical net" \
@@ -34,7 +33,7 @@ pct create $ct_id "$ct_template" \
 	--memory 512 \
 	--swap 512 \
 	--cores 1 \
-	--rootfs $ct_rootfsstorage:$ct_rootfssize,mountoptions="noatime;lazytime" \
+	--rootfs "$ct_rootfsstorage":"$ct_id"/subvol-"$ct_id"-disk-0.subvol \
 	--net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
 	--onboot 1 \
 	--arch $ct_architecture \
@@ -44,6 +43,9 @@ pct create $ct_id "$ct_template" \
 	--timezone host \
 	|| return 1
 	#--hookscript <string> Script that will be exectued during various steps in the containers lifetime.
+	# With NO previour allocation:
+ 	#--rootfs $ct_rootfsstorage:$ct_rootfssize,mountoptions="noatime;lazytime" \
+
 
 # the two following lines must be written to .conf file directly
 # pct commnad cannot handle them
