@@ -45,7 +45,7 @@ pct create $ct_id "$ct_template" \
  	#
 
 # Voluem identifier format example: pozo:99170/subvol-99170-disk-0.subvol
-local ct_rootfsvolumeid=$(pct config 99170|grep -oP 'rootfs: \K[^,]*')
+ct_rootfsvolumeid=$(pct config 99170|grep -oP 'rootfs: \K[^,]*')
 
 # BTRFS Filesystem in LXC/LXD Container
 # https://forum.proxmox.com/threads/btrfs-filesystem-in-lxc-lxd-container.118803/post-515531
