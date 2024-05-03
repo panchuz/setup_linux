@@ -22,7 +22,7 @@ fi
 # pct create 117 /mnt/pve/cephfs/template/cache/jammy-minimal-cloudimg-amd64-root.tar.xz --hostname gal1 --memory 1024 --net0 name=eth0,bridge=vmbr0,firewall=1,gw=192.168.10.1,ip=192.168.10.71/24,tag=10,type=veth --storage localb
 # lock --rootfs localblock:8 --unprivileged 1 --pool Containers --ignore-unpack-errors --ssh-public-keys /root/.ssh/authorized_keys --ostype ubuntu --password="$ROOTPASS" --start 1
 # abuot rootfs https://forum.proxmox.com/threads/does-proxmox-support-lxc-dir-backend.98486/post-425822
-pct create $ct_id "$ct_template" \
+pct create "$ct_id" "$ct_template" \
 	--hostname zerotier \
 	--description "Zerotier with NAT-Masq access to phisical net" \
 	--tags deb12,zerotier \
@@ -30,26 +30,26 @@ pct create $ct_id "$ct_template" \
 	--memory 512 \
 	--swap 512 \
 	--cores 1 \
- 	--rootfs $ct_rootfsstorage:$ct_rootfssize,size=$ct_rootfssize,mountoptions="lazytime;noatime" \
+ 	--rootfs "$ct_rootfsstorage":$ct_rootfssize,size=$ct_rootfssize,mountoptions="lazytime;noatime" \
 	--net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
 	--onboot 1 \
-	--arch $ct_architecture \
+	--arch "$ct_architecture" \
 	--protection 1 \
 	--unprivileged 1 \
  	--features nesting=1 \
 	--timezone host \
+ 	--ssh-public-keys /root/.ssh/authorized_keys \
 	--start 0 \
  	|| return 1
 	#--hookscript <string> Script that will be exectued during various steps in the containers lifetime.
-	#--ssh-public-keys /root/.ssh/authorized_keys
- 	#
 
+ 
 # Voluem identifier format example: pozo:99170/subvol-99170-disk-0.subvol
-ct_rootfsvolumeid=$(pct config 99170|grep -oP 'rootfs: \K[^,]*')
+ct_rootfsvolumeid=$(pct config "$ct_id"|grep -oP 'rootfs: \K[^,]*')
 
 # BTRFS Filesystem in LXC/LXD Container
 # https://forum.proxmox.com/threads/btrfs-filesystem-in-lxc-lxd-container.118803/post-515531
-chmod +rx $(pvesm path $ct_rootfsvolumeid)
+chmod +rx $(pvesm path "$ct_rootfsvolumeid")
 
 
 # the two following lines must be written to .conf file directly
