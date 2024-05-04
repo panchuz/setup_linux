@@ -8,8 +8,9 @@ passwd_link_args_aes256="$1" # passwd para desencriptar link_args.aes256
 #######################################################################
 
 # verificación de la cantidad de argumentos
-if [ $# -ne 1 ]; then
-	echo "Uso: ${BASH_SOURCE[0]} passwd_link_args_aes256"
+if [ $# -ne 0 ]; then
+	echo "Usage: ${BASH_SOURCE[0]}"
+	echo "No arguments supported"
 	return 1
 fi
 
@@ -143,7 +144,7 @@ main () {
 	passwd_link_args_aes256="$1"
 
 	# Load setup variables for the new ct/vm
-	linux_setup_vars
+	linux_setup_vars || return 1
 	
  	# Set time zone
 	config_huso_horario

@@ -21,7 +21,9 @@ script_directorio_nombre_stdout () {
 
 # --- Loads setup arguments in /root/.setup_arguments.sh ---
 linux_setup_vars () {
-	source /root/.linux_setup.vars.sh
+	source /root/.linux_setup.vars.sh && return 0
+	echo "/root/.linux_setup.vars.sh Not Found !!!"
+	return 1
 }
 
 
