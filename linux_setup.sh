@@ -75,14 +75,14 @@ config_postfix_nullclient_gmail () {
 
 
 # --- CONFIGURACIÓN unattended-upgrades PRUEBA MAIL ---
-config_unattended-upgrades_prueba_mail () {
+config_unattended_upgrades_prueba_mail () {
 
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARK" <<-EOF
 		Unattended-Upgrade::Mail "root";
 		Unattended-Upgrade::MailReport "always"; /* ONLY FOR TESTING PURPOSES */
 	EOF
 
-	unattended-upgrade && echo "Check unattended-upgrades mail reception in ${GOOGLE_ACCOUNT}@gmail.com"
+	unattended-upgrades && echo "Check unattended-upgrades mail reception in ${GOOGLE_ACCOUNT}@gmail.com"
 
 	# ${encabezado//\#///} subtituye "#" por "//". Ref: https://stackoverflow.com/a/43421455
 	cat >/etc/apt/apt.conf.d/51unattended-upgrades"$MARK" <<-EOF
@@ -158,7 +158,7 @@ main () {
  	# Actualización desatendida "confdef/confold"
 	# mailx es pedido en /etc/apt/apt.conf.d/50unattended-upgrades para notificar por mail
 	# apt-listchanges es indicado en https://wiki.debian.org/UnattendedUpgrades#Automatic_call_via_.2Fetc.2Fapt.2Fapt.conf.d.2F20auto-upgrades
-	debian_dist-upgrade_install libsasl2-modules postfix-pcre bsd-mailx apt-listchanges unattended-upgrades sudo
+	debian_dist_upgrade_install libsasl2-modules postfix-pcre bsd-mailx apt-listchanges unattended-upgrades sudo
 	##### rsyslog: https://itslinuxfoss.com/find-postfix-log-files/
 
 	# configurar postfix como nullclient/smtp de gmail/no-FQDN:
@@ -166,7 +166,7 @@ main () {
 	config_postfix_nullclient_gmail
  
  	# configurar uanttended-upgrades
-	config_unattended-upgrades_prueba_mail
+	config_unattended_upgrades_prueba_mail
 
 	# agregado usuario panchuz
 	# usa vars globales:  ADMIN_USER, ID_ADMIN_USER y SSH_PUB_KEY_ADMIN_USER

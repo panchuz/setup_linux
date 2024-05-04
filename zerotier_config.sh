@@ -59,7 +59,7 @@ main () {
 	link_args=$(desencript_stdout "$(cat link_args.aes256)" "$passwd_link_args_aes256")
 	source <(wget --quiet -O - --no-check-certificate "$link_args")
 
-	debian_dist-upgrade_install zerotier-one
+	debian_dist_upgrade_install zerotier-one
 
 	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
  	local encabezado
