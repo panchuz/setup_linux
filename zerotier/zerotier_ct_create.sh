@@ -9,7 +9,6 @@ usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; }
 # Sanity check
 # ref: if command; then command; else command; fi
 if ! [ $# -eq 1 ]; then { usage; return 1; }; fi
-if ! [[ $1 =~ '^[0-9]+$' ]]; then { usage; return 1; }; fi
 
 # Arguments to variables
 ct_id="$1" # new container´s ID
