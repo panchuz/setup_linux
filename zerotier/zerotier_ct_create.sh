@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-usage () {echo "Usage: ${BASH_SOURCE[0]} ct_id"; return 1; }
+usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; return 1; }
 
 #######################################################################
 #  by panchuz                                                 
