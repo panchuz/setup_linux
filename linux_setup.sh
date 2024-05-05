@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; exit 1; }
+usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; return 1; }
 
 #######################################################################
 #  by panchuz                                                         #
@@ -9,7 +9,7 @@ usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; exit 1; }
 
 # Sanity check
 # ref: if command; then command; else command; fi
-if ! [ $# -eq 0 ]; then usage; fi
+if ! [ $# -eq 0 ]; then { usage; return 1 }; fi
 
 # Load general functions 
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)

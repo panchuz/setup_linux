@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; exit 1; }
+usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; return 1; }
 
 #######################################################################
 #  by panchuz                                                 
@@ -8,8 +8,8 @@ usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; exit 1; }
 
 # Sanity check
 # ref: if command; then command; else command; fi
-if ! [ $# -eq 1 ]; then usage; fi
-if ! [[ $1 =~ '^[0-9]+$' ]]; then usage; fi
+if ! [ $# -eq 1 ]; then { usage; return 1 }; fi
+if ! [[ $1 =~ '^[0-9]+$' ]]; then { usage; return 1 }; fi
 
 # Arguments to variables
 ct_id="$1" # new container´s ID
