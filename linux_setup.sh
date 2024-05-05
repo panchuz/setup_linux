@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
-passwd_link_args_aes256="$1" # passwd para desencriptar link_args.aes256
+usage () {echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; return 1; }
 
 #######################################################################
-#  creado por panchuz                                                 #
+#  by panchuz                                                         #
 #  para automatizar la configuración inicial de lxc generado en base  #
 #  al template debian-12-standard_12.0-1_amd64.tar.zst de Proxmox VE  #
 #######################################################################
 
-# verificación de la cantidad de argumentos
-if [ $# -ne 0 ]; then
-	echo "Usage: ${BASH_SOURCE[0]}"
-	echo "No arguments supported"
-	return 1
-fi
+# Sanity check
+[ $# -ne 0 ] && usage
 
-# carga de biblioteca de funciones generales
+# Load general functions 
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
 
 
-# CONFIGURACIÓN LOCAL
+# LOCALE configuration
 crear_archivo_profile_locale () {
 	cat >/etc/profile.d/profile"$MARK".sh <<-EOF
 		$encabezado
@@ -141,8 +137,6 @@ sshd_configuration () {
 
 #------------------FUNCIÓN main------------------
 main () {
-	passwd_link_args_aes256="$1"
-
 	# Load setup variables for the new ct/vm
 	linux_setup_vars || return 1
 	
@@ -169,14 +163,9 @@ main () {
  	# configurar uanttended-upgrades
 	config_unattended_upgrades_prueba_mail
 
-	# agregado usuario panchuz
-	# usa vars globales:  ADMIN_USER, ID_ADMIN_USER y SSH_PUB_KEY_ADMIN_USER
-	# si no se proporcionó ADMIN_USER_PASSWD, se usa passwd_link_args_aes256 en su lugar
-	if [ -n "$ADMIN_USER_PASSWD" ]; then
-		agregar_usuario_admin "$ADMIN_USER" "$ID_ADMIN_USER" "$ADMIN_USER_PASSWD" "$SSH_PUB_KEY_ADMIN_USER"
-	else
-		agregar_usuario_admin "$ADMIN_USER" "$ID_ADMIN_USER" "$passwd_link_args_aes256" "$SSH_PUB_KEY_ADMIN_USER"
-	fi
+	# Add administrative user
+	# uses global variables:  ADMIN_USER, ID_ADMIN_USER y SSH_PUB_KEY_ADMIN_USER
+	agregar_usuario_admin "$ADMIN_USER" "$ID_ADMIN_USER" "$ADMIN_USER_ENC_PASSWD" "$SSH_PUB_KEY_ADMIN_USER"
 
 	# configuración sshd: puerto y agrega autorizedkeys con MARK
 	# usa vars globales: encabezado, MARK y SSHD_PORT
@@ -195,7 +184,7 @@ main () {
 # Root privileges verification
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( EUID == 0 )); then
-	main "$passwd_link_args_aes256"
+	main
 else
-	echo "ERROR: Este script se debe ejecutar con privilegios root"
+	echo "ERROR: Must be run with root privileges"
 fi

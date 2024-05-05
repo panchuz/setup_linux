@@ -1,22 +1,20 @@
 #!/usr/bin/env bash
-ct_id="$1" # new container´s ID
+usage () {echo "Usage: ${BASH_SOURCE[0]} ct_id"; return 1; }
 
 #######################################################################
 #  by panchuz                                                 
 #  creation of zerotier lxc container
 #######################################################################
 
-# loads funcions
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
+# Sanity check
+[ $# -ne 1 ] && usage
+! [[ $1 =~ '^[0-9]+$' ]] && usage
 
-# loads variables
-linux_setup_vars
+# Arguments to variables
+ct_id="$1" # new container´s ID
 
-# checking the number of arguments
-if [ $# -ne 1 ]; then
-    echo "Uso: ${BASH_SOURCE[0]} ct_id"
-    return 1
-fi
+# Loads variables from file
+source /root/.ct_create.vars.sh ||return 1
 
 # https://forum.proxmox.com/threads/how-to-create-a-container-from-command-line-pct-create.107304/
 # pct create 117 /mnt/pve/cephfs/template/cache/jammy-minimal-cloudimg-amd64-root.tar.xz --hostname gal1 --memory 1024 --net0 name=eth0,bridge=vmbr0,firewall=1,gw=192.168.10.1,ip=192.168.10.71/24,tag=10,type=veth --storage localb
@@ -38,11 +36,10 @@ pct create "$ct_id" "$ct_template" \
 	--unprivileged 1 \
  	--features nesting=1 \
 	--timezone host \
- 	--ssh-public-keys /root/.ssh/authorized_keys \
-	--start 0 \
+ 	--start 0 \
  	|| return 1
 	#--hookscript <string> Script that will be exectued during various steps in the containers lifetime.
-
+	#--ssh-public-keys /root/.ssh/authorized_keys \
  
 # Voluem identifier format example: pozo:99170/subvol-99170-disk-0.subvol
 ct_rootfsvolumeid=$(pct config "$ct_id"|grep -oP 'rootfs: \K[^,]*')

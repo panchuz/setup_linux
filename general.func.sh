@@ -80,17 +80,16 @@ debian_dist_upgrade_install () {
 agregar_usuario_admin () {
 	nuevo_usuario="$1"
 	id_nuevo_usuario="$2"
-	ADMIN_USER_PASSWD="$3"
+	ADMIN_USER_ENC_PASSWD="$3"
 	ssh_pub_key_nuevo_usuario="$4"
 
 	useradd --uid "$id_nuevo_usuario" \
+		--password "$ADMIN_USER_ENC_PASSWD" \
 		--shell /bin/bash \
 		--create-home \
 		--groups sudo,systemd-journal,adm \
 		"$nuevo_usuario" \
 		|| return 1
-
-	echo "$nuevo_usuario:$ADMIN_USER_PASSWD" | chpasswd
 
 	# Para poder hacer ping http://unixetc.co.uk/2016/05/30/linux-capabilities-and-ping/
 	setcap cap_net_raw+p "$(which ping)"
