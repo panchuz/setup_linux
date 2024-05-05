@@ -7,8 +7,8 @@ usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; return 1; }
 #######################################################################
 
 # Sanity check
-[ $# -ne 1 ] && usage
-! [[ $1 =~ '^[0-9]+$' ]] && usage
+[ $# -ne 1 ] && usage || return 1
+! [[ $1 =~ '^[0-9]+$' ]] && usage || return 1
 
 # Arguments to variables
 ct_id="$1" # new container´s ID

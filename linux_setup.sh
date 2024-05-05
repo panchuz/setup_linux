@@ -8,7 +8,7 @@ usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; return 1; }
 #######################################################################
 
 # Sanity check
-[ $# -ne 0 ] && usage
+[ $# -ne 0 ] && usage || return 1
 
 # Load general functions 
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
