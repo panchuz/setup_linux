@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; }
 
+# variables file 
+vars_path="/root/.vars"
+linux_setup_vars_file="$vars_path"/linux_setup.vars.sh
+
 #######################################################################
 #  by panchuz                                                         #
 #  para automatizar la configuración inicial de lxc generado en base  #
@@ -11,8 +15,13 @@ usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; }
 # ref: if command; then command; else command; fi
 if ! [ $# -eq 0 ]; then { usage; return 1; }; fi
 
+
+# --- Loads variables  ---
+source "$linux_setup_vars_file" || return 1
+
 # Load general functions 
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh) ||\
+	return 1
 
 
 # LOCALE configuration

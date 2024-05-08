@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; }
 
+github_branch=test
+
 vars_path="/root/.vars"
 ct_create_vars_file="$vars_path"/ct_create.vars.sh
 linux_setup_vars_file="$vars_path"/linux_setup.vars.sh
@@ -69,10 +71,13 @@ pct start "$ct_id" || return 1
 pct exec "$ct_id" -- bash -c \
 	"usermod --password $ct_encrootpasswd root"
 
+# Moving vars file
+pct exec "$ct_id" -- bash -c \
+	"mkdir $vars_path"
 pct push "$ct_id" "$linux_setup_vars_file" "$linux_setup_vars_file"
 
 pct exec "$ct_id" -- bash -c \
-	"wget -qP /root https://github.com/panchuz/linux_setup/raw/main/linux_setup.sh &&\
+	"wget -qP /root https://github.com/panchuz/linux_setup/raw/$github_branch/linux_setup.sh &&\
 	source /root/linux_setup.sh"
 
 

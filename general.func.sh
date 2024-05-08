@@ -19,14 +19,6 @@ script_directorio_nombre_stdout () {
 	echo "$directorio/$nombre"
 }
 
-# --- Loads setup arguments in /root/.setup_arguments.sh ---
-linux_setup_vars () {
-	source /root/.linux_setup.vars.sh && return 0
-	echo "/root/.linux_setup.vars.sh Not Found !!!"
-	return 1
-}
-
-
 
 # --- GENERA ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN ---
 encabezado_stdout () {
