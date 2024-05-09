@@ -6,6 +6,7 @@ github_branch=test
 vars_path="/root/.vars"
 ct_create_vars_file="$vars_path"/ct_create.vars.sh
 linux_setup_vars_file="$vars_path"/linux_setup.vars.sh
+zerotier_setup_vars_file="$vars_path"/zerotier_setup.vars.sh
 
 #######################################################################
 #  by panchuz                                                 
@@ -72,12 +73,16 @@ pct exec "$ct_id" -- bash -c \
 	"usermod --password '$ct_encrootpasswd' root"
 
 # Moving vars file
-pct exec "$ct_id" -- bash -c \
-	"mkdir $vars_path"
+pct exec "$ct_id" -- bash -c "mkdir $vars_path"
 pct push "$ct_id" "$linux_setup_vars_file" "$linux_setup_vars_file"
 
 pct exec "$ct_id" -- bash -c \
 	"wget -qP /root https://github.com/panchuz/linux_setup/raw/$github_branch/linux_setup.sh &&\
 	source /root/linux_setup.sh"
 
-#
+# ZeroTier setup to route between ZeroTier and Physical Networks
+pct push "$ct_id" "$zerotier_setup_vars_file" "$zerotier_setup_vars_file"
+
+pct exec "$ct_id" -- bash -c \
+	"wget -qP /root https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/zerotier_setup.sh &&\
+	source /root/zerotier_setup.sh"

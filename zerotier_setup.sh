@@ -58,12 +58,15 @@ crea_dropin_zerotier () {
 
 #------------------FUNCIÓN main------------------
 main () {
-	debian_dist_upgrade_install zerotier-one ||return 1
+	debian_dist_upgrade_install curl gnupg ||return 1
+
+	curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && \  
+		if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | sudo bash; fi
 
 	zerotier-cli join $NETWORK_ID
 	zerotier-cli listnetworks
 
-	echo "Authorize $(hostname) at my.zerotier.com/network/$NETWORK_ID"
+	echo "IMPORTANT: Authorize $(hostname) at my.zerotier.com/network/$NETWORK_ID"
 
 	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
  	local encabezado
