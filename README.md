@@ -15,13 +15,13 @@ bash script aimed at first configuration for a homelab debian 12 linux container
 ## Download linux_setup.sh and source it
 ```
 wget -qP /root https://github.com/panchuz/linux_setup/raw/$github_branch/linux_setup.sh && \
-    source /root/linux_setup.sh passwd_link_args
+    source /root/linux_setup.sh
 ```
 
 ## Download zerotier_setup.sh and source it
 ```
 wget -qP /root https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/zerotier_setup.sh && \
-	source /root/zerotier_setup.sh"
+	source /root/zerotier_setup.sh
 ```
 
 ## Cargar funciones general.func.sh

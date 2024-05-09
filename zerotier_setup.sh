@@ -25,6 +25,12 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup
 	 
 # CREA DROP-IN PARA ACCESO A LAN FÍSICA DESDE ZEROTIER
 crea_dropin_zerotier () {
+	# https://www.man7.org/linux/man-pages/man1/systemctl.1.html
+	#systemctl edit --drop-in=limits.conf --stdin some-service.service <<EOF
+	#[Unit]
+	#AllowedCPUs=7,11
+	#EOF
+	mkdir /etc/systemd/system/zerotier-one.service.d
 	cat >/etc/systemd/system/zerotier-one.service.d/nat-masq"$MARK".conf <<-EOF
 		$encabezado
 		#
