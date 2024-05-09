@@ -1,19 +1,25 @@
 #!/usr/bin/env bash
-passwd_link_args_aes256="$1" # passwd para desencriptar link_args.aes256
+usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; }
+
+# variables file 
+vars_path="/root/.vars"
+zerotier_setup_vars_file="$vars_path"/zerotier_setup.vars.sh
 
 #######################################################################
-#  creado por panchuz                                                 
-#  para automatizar la configuración inicial de lxc con zerotier en base  
-#  al template debian-12-standard_12.0-1_amd64.tar.zst de Proxmox VE  
+#  by panchuz
+#  to install and configure zerotier to connecto to a netowork
+#  and route to fisical network
+#  https://zerotier.atlassian.net/wiki/x/CgBgDQ  
 #######################################################################
 
-# verificación de la cantidad de argumentos
-if [ $# -ne 1 ]; then
-    echo "Uso: ${BASH_SOURCE[0]} passwd_link_args_aes256"
-    return 1
-fi
+# Sanity check
+# ref: if command; then command; else command; fi
+if ! [ $# -eq 0 ]; then { usage; return 1; }; fi
 
-# carga de biblioteca de funciones generales
+# --- Loads variables  ---
+source "$zerotier_setup_vars_file" || return 1
+
+# Load general functions 
 source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
 
 	 
@@ -44,7 +50,7 @@ crea_dropin_zerotier () {
 		        } \; \\
 		    }
 
-		ExecStopPost= /usr/sbin/nft delete table ip zt-nat
+		ExecStopPost= /usr/sbin/nft delete table ip zt-nat-masq
 		ExecStopPost= /usr/sbin/sysctl -w net.ipv4.ip_forward=0
 	EOF
 }
@@ -52,14 +58,12 @@ crea_dropin_zerotier () {
 
 #------------------FUNCIÓN main------------------
 main () {
-	passwd_link_args_aes256="$1"
+	debian_dist_upgrade_install zerotier-one ||return 1
 
-	#carga de argumentos
-	wget --quiet https://github.com/panchuz/linux_setup/raw/main/link_args.aes256
-	link_args=$(desencript_stdout "$(cat link_args.aes256)" "$passwd_link_args_aes256")
-	source <(wget --quiet -O - --no-check-certificate "$link_args")
+	zerotier-cli join $NETWORK_ID
+	zerotier-cli listnetworks
 
-	debian_dist_upgrade_install zerotier-one
+	echo "Authorize $(hostname) at my.zerotier.com/network/$NETWORK_ID"
 
 	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
  	local encabezado
@@ -67,21 +71,24 @@ main () {
 
 	crea_dropin_zerotier
 
- 	# reboot necesario????
+	systemctl daemon-reload
+	systemctl restart zerotier-one.service
+	
+ 	# reboot needed ???
  	if [ -f /var/run/reboot-required ]; then
-  		echo "Se procede a reiniciar"
-		/bin/sleep 5
-		reboot
+  		echo "--- REBOOT REQUIERD ---"
+	#	/bin/sleep 5
+	#	reboot
  	else
- 		echo "NO se necesita reiniciar"
+ 		echo "Reboot NOT requierd"
   	fi
 }
 
 
-# Verificación de privilegios
+# Root privileges verification
 # https://stackoverflow.com/questions/18215973/how-to-check-if-running-as-root-in-a-bash-script
 if (( EUID == 0 )); then
-	main "$passwd_link_args_aes256"
+	main
 else
-	echo "ERROR: Este script se debe ejecutar con privilegios root"
+	echo "ERROR: Must be run with root privileges"
 fi

@@ -80,5 +80,4 @@ pct exec "$ct_id" -- bash -c \
 	"wget -qP /root https://github.com/panchuz/linux_setup/raw/$github_branch/linux_setup.sh &&\
 	source /root/linux_setup.sh"
 
-
-#  lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/tteck/Proxmox/main/install/$var_install.sh)" || exit
+#

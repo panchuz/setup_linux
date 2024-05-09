@@ -178,7 +178,7 @@ main () {
 	# usa vars globales: encabezado, MARK y SSHD_PORT
 	sshd_configuration
 
- 	# reboot necesario????
+ 	# reboot needed ???
  	if [ -f /var/run/reboot-required ]; then
   		echo "--- REBOOT REQUIERD ---"
 	#	/bin/sleep 5

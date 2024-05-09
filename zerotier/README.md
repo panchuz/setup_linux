@@ -26,3 +26,13 @@ table ip zt-nat {
 }
 panchuz@zt:~$ 
 
+nftables cheat sheet:
+
+Load rules: nft -f /etc/sysconfig/nftables.conf (this will append them to the existing ones, so flushing first might be required)
+Watch rules: nft list ruleset
+Reset rules: nft flush ruleset
+Speaking of your request:
+
+nft list ruleset | grep dport
+
+Since tables and chains can be called pretty much anything, it's kinda hard to devise a script which will list only rules for type filter hook input.
