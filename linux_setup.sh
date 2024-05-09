@@ -147,9 +147,6 @@ sshd_configuration () {
 
 #------------------FUNCIÓN main------------------
 main () {
-	# Load setup variables for the new ct/vm
-	linux_setup_vars || return 1
-	
  	# Set time zone
 	config_huso_horario
  

@@ -69,7 +69,7 @@ pct start "$ct_id" || return 1
 
 # https://gist.github.com/tinoji/7e066d61a84d98374b08d2414d9524f2
 pct exec "$ct_id" -- bash -c \
-	"usermod --password $ct_encrootpasswd root"
+	"usermod --password '$ct_encrootpasswd' root"
 
 # Moving vars file
 pct exec "$ct_id" -- bash -c \
