@@ -1,7 +1,7 @@
 
-## Ejecutar script de creación de CT zerotier
+## To create a zerotier ct
 ```
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/zerotier/zerotier_ct_create.sh) 200
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/zerotier/zerotier_ct_create.sh) 200
 ```
 
 panchuz@zt:~$ sudo nft list ruleset

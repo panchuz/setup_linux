@@ -12,6 +12,11 @@ bash script aimed at first configuration for a homelab debian 12 linux container
 - reestart needed or not needed message
 
 
+## To create a ct providing ct_id ct_hostname ct_description
+```
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/ct_create.sh) ct_id ct_hostname ct_description
+```
+
 ## Download linux_setup.sh and source it
 ```
 wget -qP /root https://github.com/panchuz/linux_setup/raw/$github_branch/linux_setup.sh && \
@@ -26,13 +31,13 @@ wget -qP /root https://raw.githubusercontent.com/panchuz/linux_setup/$github_bra
 
 ## Cargar funciones general.func.sh
 ```
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/general.func.sh)
 ```
 
 ## Download linux_setup.sh and execute locally
 ## does not change LANG enviroment varible
 ```
-wget -P /root https://github.com/panchuz/linux_setup/raw/main/linux_setup.sh 
+wget -P /root https://github.com/panchuz/linux_setup/raw/$github_branch/linux_setup.sh 
 chmod +x /root/linux_setup.sh
 /root/linux_setup.sh
 ```

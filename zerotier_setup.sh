@@ -20,7 +20,7 @@ if ! [ $# -eq 0 ]; then { usage; return 1; }; fi
 source "$zerotier_setup_vars_file" || return 1
 
 # Load general functions 
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/general.func.sh)
 
 	 
 # CREA DROP-IN PARA ACCESO A LAN FÍSICA DESDE ZEROTIER
@@ -72,7 +72,7 @@ main () {
 	zerotier-cli join $NETWORK_ID
 	zerotier-cli listnetworks
 
-	echo "IMPORTANT: Authorize $(hostname) at my.zerotier.com/network/$NETWORK_ID"
+	echo "#####   IMPORTANT: Authorize $(hostname) at my.zerotier.com/network/$NETWORK_ID   #####"
 
 	# genera y guarda encabezado de texto para uso posterior en archivos creados por el script
  	local encabezado
