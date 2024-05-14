@@ -72,17 +72,21 @@ pct start "$ct_id" || return 1
 pct exec "$ct_id" -- bash -c \
 	"usermod --password '$ct_encrootpasswd' root"
 
-# Moving vars file
+# Moving Linux vars file
 pct exec "$ct_id" -- bash -c "mkdir $vars_path"
 pct push "$ct_id" "$linux_setup_vars_file" "$linux_setup_vars_file"
-
+# following is needed to source "general.func.sh" form within the scripts executed inside ct/vm
 pct exec "$ct_id" -- bash -c \
-	"wget -qP /root https://github.com/panchuz/linux_setup/raw/test/linux_setup.sh &&\
+	"echo $'\n\n'export github_branch=$github_branch >> $linux_setup_vars_file"
+
+# Linux general setup for the newborn
+pct exec "$ct_id" -- bash -c \
+	"wget -qP /root https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/linux_setup.sh &&\
 	source /root/linux_setup.sh"
 
 # ZeroTier setup to route between ZeroTier and Physical Networks
 pct push "$ct_id" "$zerotier_setup_vars_file" "$zerotier_setup_vars_file"
 
 pct exec "$ct_id" -- bash -c \
-	"wget -qP /root https://raw.githubusercontent.com/panchuz/linux_setup/test/zerotier_setup.sh &&\
+	"wget -qP /root https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/zerotier_setup.sh &&\
 	source /root/zerotier_setup.sh"

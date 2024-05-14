@@ -19,7 +19,7 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup
 
 ## Download linux_setup.sh and source it
 ```
-wget -qP /root https://github.com/panchuz/linux_setup/raw/$github_branch/linux_setup.sh && \
+wget -qP /root https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/linux_setup.sh && \
     source /root/linux_setup.sh
 ```
 
@@ -37,7 +37,7 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup
 ## Download linux_setup.sh and execute locally
 ## does not change LANG enviroment varible
 ```
-wget -P /root https://github.com/panchuz/linux_setup/raw/$github_branch/linux_setup.sh 
+wget -P /root https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/linux_setup.sh 
 chmod +x /root/linux_setup.sh
 /root/linux_setup.sh
 ```
