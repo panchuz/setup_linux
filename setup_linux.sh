@@ -3,7 +3,7 @@ usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; }
 
 # variables file 
 vars_path="/root/.vars"
-linux_setup_vars_file="$vars_path"/linux_setup.vars.sh
+setup_linux_vars_file="$vars_path"/setup_linux.vars.sh
 
 #######################################################################
 #  by panchuz                                                         #
@@ -17,10 +17,10 @@ if ! [ $# -eq 0 ]; then { usage; return 1; }; fi
 
 
 # --- Loads variables  ---
-source "$linux_setup_vars_file" || return 1
+source "$setup_linux_vars_file" || return 1
 
 # Load general functions 
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/$github_branch/general.func.sh) ||\
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/general.func.sh) ||\
 	return 1
 
 
