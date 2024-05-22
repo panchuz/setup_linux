@@ -32,6 +32,13 @@ export github_branch=test && \
 	source /root/setup_zerotier.sh
 ```
 
+## Download setup_zerotier.sh and source it
+```
+export github_branch=test && \
+    wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/setup_cloudflare.sh && \
+	source /root/setup_cloudflare.sh
+```
+
 ## Load general.func.sh
 ```
 export github_branch=test && \

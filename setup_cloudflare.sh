@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; }
 
-set -e -u
+set -u
 
 # variables file 
 vars_path="/root/.vars"
-setup_vars_file="$vars_path"/setup_cloudflare.vars.sh
+setup_cloudflare_vars_file="$vars_path"/setup_cloudflare.vars.sh
 
 #######################################################################
 #  by panchuz
@@ -21,7 +21,7 @@ if ! [ $# -eq 0 ]; then { usage; return 1; }; fi
 source "$setup_cloudflare_vars_file"
 
 # Load general functions 
-# source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/general.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/general.func.sh)
 
 
 #------------------FUNCIÓN main------------------
