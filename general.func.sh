@@ -5,17 +5,17 @@
 # *a prueba de source y simlinks de directorio y archivo
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
 script_directorio_nombre_stdout () {
-	local source
-	source=${BASH_SOURCE[0]}
+	local bash_source
+	bash_source=${BASH_SOURCE[0]}
 	local directorio
-	while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
-	  directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
-	  source=$(readlink "$source")
-	  [[ $source != /* ]] && source=$directorio/$source # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+	while [ -L "$bash_source" ]; do # resolve $source until the file is no longer a symlink
+	  directorio=$( cd -P "$( dirname "$bash_source" )" >/dev/null 2>&1 && pwd )
+	  bash_sourcesource=$(readlink "$bash_source")
+	  [[ $bash_source != /* ]] && source=$directorio/$bash_source # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 	done
-	directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
+	directorio=$( cd -P "$( dirname "$bash_source" )" >/dev/null 2>&1 && pwd )
 	local nombre
-	nombre=$(basename "$source")
+	nombre=$(basename "$bash_source")
 	echo "$directorio/$nombre"
 }
 

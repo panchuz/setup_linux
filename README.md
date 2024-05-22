@@ -14,29 +14,34 @@ bash script aimed at first configuration for a homelab debian 12 linux container
 
 ## To create a ct providing ct_id ct_hostname ct_description
 ```
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/ct_create.sh) ct_id ct_hostname ct_description
+export github_branch=test && \
+    source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/ct_create.sh) ct_id ct_hostname ct_description
 ```
 
 ## Download setup_linux.sh and source it
 ```
-wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/setup_linux.sh && \
+export github_branch=test && \
+    wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/setup_linux.sh && \
     source /root/setup_linux.sh
 ```
 
 ## Download setup_zerotier.sh and source it
 ```
-wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/setup_zerotier.sh && \
+export github_branch=test && \
+    wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/setup_zerotier.sh && \
 	source /root/setup_zerotier.sh
 ```
 
 ## Load general.func.sh
 ```
-(export github_branch=test && source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/general.func.sh))
+export github_branch=test && \
+    source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/general.func.sh)
 ```
 
 ## Download setup_linux.sh and execute locally
 ## does not change LANG enviroment varible
 ```
+export github_branch=test
 wget -P /root https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/setup_linux.sh 
 chmod +x /root/setup_linux.sh
 /root/setup_linux.sh

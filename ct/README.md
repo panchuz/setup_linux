@@ -1,7 +1,8 @@
 
 ## To create a zerotier ct
 ```
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/zerotier/ct_create_zerotier.sh) 200
+export github_branch=test && \
+        source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/zerotier/ct_create_zerotier.sh) 000
 ```
 
 panchuz@zt:~$ sudo nft list ruleset
