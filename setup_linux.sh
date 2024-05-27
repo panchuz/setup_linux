@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; }
 
+set -u
+
 # variables file 
 vars_path="/root/.vars"
 setup_linux_vars_file="$vars_path"/setup_linux.vars.sh
@@ -20,7 +22,7 @@ if ! [ $# -eq 0 ]; then { usage; return 1; }; fi
 source "$setup_linux_vars_file" || return 1
 
 # Load general functions 
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/general.func.sh) ||\
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/general.func.sh) ||\
 	return 1
 
 

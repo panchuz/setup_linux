@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; }
 
-github_branch=test
+set -u
 
 vars_path="/root/.vars"
 ct_create_vars_file="$vars_path"/ct_create.vars.sh
@@ -77,16 +77,16 @@ pct exec "$ct_id" -- bash -c "mkdir $vars_path"
 pct push "$ct_id" "$setup_linux_vars_file" "$setup_linux_vars_file"
 # following is needed to source "general.func.sh" form within the scripts executed inside ct/vm
 pct exec "$ct_id" -- bash -c \
-	"echo $'\n\n'export github_branch=$github_branch >> $setup_linux_vars_file"
+	"echo $'\n\n'export GITHUB_BRANCH=$GITHUB_BRANCH >> $setup_linux_vars_file"
 
 # Linux general setup for the newborn
 pct exec "$ct_id" -- bash -c \
-	"wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/setup_linux.sh &&\
+	"wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_linux.sh &&\
 	source /root/setup_linux.sh"
 
 # ZeroTier setup to route between ZeroTier and Physical Networks
 pct push "$ct_id" "$setup_zerotier_vars_file" "$setup_zerotier_vars_file"
 
 pct exec "$ct_id" -- bash -c \
-	"wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/setup_zerotier.sh &&\
+	"wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_zerotier.sh &&\
 	source /root/setup_zerotier.sh"

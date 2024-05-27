@@ -21,7 +21,7 @@ if ! [ $# -eq 0 ]; then { usage; return 1; }; fi
 source "$setup_cloudflare_vars_file"
 
 # Load general functions 
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$github_branch/general.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/general.func.sh)
 
 
 #------------------FUNCIÓN main------------------
