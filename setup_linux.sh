@@ -162,8 +162,7 @@ main () {
  	# Actualización desatendida "confdef/confold"
 	# mailx es pedido en /etc/apt/apt.conf.d/50unattended-upgrades para notificar por mail
 	# apt-listchanges es indicado en https://wiki.debian.org/UnattendedUpgrades#Automatic_call_via_.2Fetc.2Fapt.2Fapt.conf.d.2F20auto-upgrades
-	debian_dist_upgrade_install libsasl2-modules postfix-pcre bsd-mailx apt-listchanges unattended-upgrades sudo
-	##### rsyslog: https://itslinuxfoss.com/find-postfix-log-files/
+	apt_dist_upgrade_install libsasl2-modules postfix-pcre bsd-mailx apt-listchanges unattended-upgrades sudo curl gnupg
 
 	# configurar postfix como nullclient/smtp de gmail/no-FQDN:
 	# usa $GOOGLE_ACCOUNT y $GMAIL_APP_PASSWD

@@ -26,8 +26,6 @@ source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux
 
 #------------------FUNCIÓN main------------------
 main () {
-	debian_dist_upgrade_install curl
-
 	curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
 	dpkg -i cloudflared.deb
 	cloudflared service install "$cloudflared_token"

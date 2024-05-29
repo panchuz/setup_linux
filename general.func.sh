@@ -38,7 +38,7 @@ encabezado_stdout () {
 # https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
 # https://devicetests.com/silence-apt-get-install-output
 # https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
-debian_dist_upgrade_install () {
+apt_dist_upgrade_install () {
 	## argumentos: paquetes a instalar luego del dist-upgrade
 	# se comentó la sig línea para evitar el reinicio automático
 	#export NEEDRESTART_MODE=a
