@@ -14,35 +14,35 @@ bash script aimed at first configuration for a homelab debian 12 linux container
 
 ## Download setup_linux.sh and source it (inside the OS)
 ```
-export GITHUB_BRANCH=test && \
+export GITHUB_BRANCH=main && \
     wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_linux.sh && \
     source /root/setup_linux.sh
 ```
 
 ## Download setup_zerotier.sh and source it (inside the OS)
 ```
-export GITHUB_BRANCH=test && \
+export GITHUB_BRANCH=main && \
     wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_zerotier.sh && \
 	source /root/setup_zerotier.sh
 ```
 
 ## Download setup_zerotier.sh and source it (inside the OS)
 ```
-export GITHUB_BRANCH=test && \
+export GITHUB_BRANCH=main && \
     wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_cloudflare.sh && \
 	source /root/setup_cloudflare.sh
 ```
 
 ## Load general.func.sh
 ```
-export GITHUB_BRANCH=test && \
+export GITHUB_BRANCH=main && \
     source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/general.func.sh)
 ```
 
 ## Download setup_linux.sh and execute locally
 ## does not change LANG enviroment varible
 ```
-export GITHUB_BRANCH=test
+export GITHUB_BRANCH=main
 wget -P /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_linux.sh 
 chmod +x /root/setup_linux.sh
 /root/setup_linux.sh

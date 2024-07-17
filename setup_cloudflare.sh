@@ -35,7 +35,7 @@ main () {
 	echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared bookworm main' | tee /etc/apt/sources.list.d/cloudflared.list
 
 	# install cloudflared
-	apt-get install cloudflared
+	apt-get update && apt-get install cloudflared
 
 	cloudflared service install "$cloudflared_token"
 	
