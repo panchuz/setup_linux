@@ -30,7 +30,7 @@ source "$ct_create_vars_file" ||return 1
 pct create "$ct_id" "$ct_template" \
 	--hostname zerotier \
 	--description "Zerotier with NAT-Masq access to phisical net" \
-	--tags deb12,zerotier \
+	--tags deb12,admin \
 	--memory 512 \
 	--swap 512 \
 	--cores 1 \
