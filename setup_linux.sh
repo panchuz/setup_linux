@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; }
 
+set -u
+
+# variables file 
+vars_path="/root/.vars"
+setup_linux_vars_file="$vars_path"/setup_linux.vars.sh
+
 #######################################################################
 #  by panchuz                                                         #
 #  para automatizar la configuración inicial de lxc generado en base  #
@@ -11,8 +17,13 @@ usage () { echo "Usage: ${BASH_SOURCE[0]}\nNo arguments supported"; }
 # ref: if command; then command; else command; fi
 if ! [ $# -eq 0 ]; then { usage; return 1; }; fi
 
+
+# --- Loads variables  ---
+source "$setup_linux_vars_file" || return 1
+
 # Load general functions 
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
+source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/general.func.sh) ||\
+	return 1
 
 
 # LOCALE configuration
@@ -138,9 +149,6 @@ sshd_configuration () {
 
 #------------------FUNCIÓN main------------------
 main () {
-	# Load setup variables for the new ct/vm
-	linux_setup_vars || return 1
-	
  	# Set time zone
 	config_huso_horario
  
@@ -154,8 +162,7 @@ main () {
  	# Actualización desatendida "confdef/confold"
 	# mailx es pedido en /etc/apt/apt.conf.d/50unattended-upgrades para notificar por mail
 	# apt-listchanges es indicado en https://wiki.debian.org/UnattendedUpgrades#Automatic_call_via_.2Fetc.2Fapt.2Fapt.conf.d.2F20auto-upgrades
-	debian_dist_upgrade_install libsasl2-modules postfix-pcre bsd-mailx apt-listchanges unattended-upgrades sudo
-	##### rsyslog: https://itslinuxfoss.com/find-postfix-log-files/
+	apt_dist_upgrade_install libsasl2-modules postfix-pcre bsd-mailx apt-listchanges unattended-upgrades sudo curl gnupg
 
 	# configurar postfix como nullclient/smtp de gmail/no-FQDN:
 	# usa $GOOGLE_ACCOUNT y $GMAIL_APP_PASSWD
@@ -172,7 +179,7 @@ main () {
 	# usa vars globales: encabezado, MARK y SSHD_PORT
 	sshd_configuration
 
- 	# reboot necesario????
+ 	# reboot needed ???
  	if [ -f /var/run/reboot-required ]; then
   		echo "--- REBOOT REQUIERD ---"
 	#	/bin/sleep 5

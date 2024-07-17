@@ -1,4 +1,4 @@
-# linux_setup
+# setup_linux
 bash script aimed at first configuration for a homelab debian 12 linux container:
 - utf.8
 - time zone
@@ -12,32 +12,49 @@ bash script aimed at first configuration for a homelab debian 12 linux container
 - reestart needed or not needed message
 
 
-## Comando para bajar el .sh y ejecutarlo localmente
-## no modifica enviroment (e.g.:LANG)
+## Download setup_linux.sh and source it (inside the OS)
 ```
-wget -P /root https://github.com/panchuz/linux_setup/raw/main/linux_setup.sh 
-chmod +x /root/linux_setup.sh
-/root/linux_setup.sh passwd_link_args
-```
-
-## Comando para bajar el .sh y ejecutarlo como "source"
-```
-wget -qP /root https://github.com/panchuz/linux_setup/raw/main/linux_setup.sh &&
-source /root/linux_setup.sh passwd_link_args
+export GITHUB_BRANCH=main && \
+    wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_linux.sh && \
+    source /root/setup_linux.sh
 ```
 
-## Cargar funciones general.func.sh
+## Download setup_zerotier.sh and source it (inside the OS)
 ```
-source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/linux_setup/main/general.func.sh)
+export GITHUB_BRANCH=main && \
+    wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_zerotier.sh && \
+	source /root/setup_zerotier.sh
 ```
 
-### Formato del archivo de Argumentos para linux_setup.sh
+## Download setup_zerotier.sh and source it (inside the OS)
+```
+export GITHUB_BRANCH=main && \
+    wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_cloudflare.sh && \
+	source /root/setup_cloudflare.sh
+```
+
+## Load general.func.sh
+```
+export GITHUB_BRANCH=main && \
+    source <(wget --quiet -O - https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/general.func.sh)
+```
+
+## Download setup_linux.sh and execute locally
+## does not change LANG enviroment varible
+```
+export GITHUB_BRANCH=main
+wget -P /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_linux.sh 
+chmod +x /root/setup_linux.sh
+/root/setup_linux.sh
+```
+
+### setup_linux.vars.sh file format
 ```
 #variable_name=variable_content
 MARK="_mark"
 
 LANG="C.utf8"
-TZ="America/Argentina/Buenos_Aires"
+TZ="Continent/Country/City"
 
 GOOGLE_ACCOUNT=account_name
 GMAIL_APP_PASSWD=abcdefghijklmnop
@@ -45,6 +62,7 @@ SSHD_PORT=12345
 
 ADMIN_USER=anyone
 ID_ADMIN_USER=1234
+# openssl passwd -6 -salt $ADMIN_USER "super-cool-password"
 ADMIN_USER_ENC_PASSWD=
 SSH_PUB_KEY_ADMIN_USER="key-type key comment"
 ```

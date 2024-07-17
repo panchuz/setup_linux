@@ -5,27 +5,19 @@
 # *a prueba de source y simlinks de directorio y archivo
 # https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
 script_directorio_nombre_stdout () {
-	local source
-	source=${BASH_SOURCE[0]}
+	local bash_source
+	bash_source=${BASH_SOURCE[0]}
 	local directorio
-	while [ -L "$source" ]; do # resolve $source until the file is no longer a symlink
-	  directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
-	  source=$(readlink "$source")
-	  [[ $source != /* ]] && source=$directorio/$source # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+	while [ -L "$bash_source" ]; do # resolve $source until the file is no longer a symlink
+	  directorio=$( cd -P "$( dirname "$bash_source" )" >/dev/null 2>&1 && pwd )
+	  bash_sourcesource=$(readlink "$bash_source")
+	  [[ $bash_source != /* ]] && source=$directorio/$bash_source # if $source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 	done
-	directorio=$( cd -P "$( dirname "$source" )" >/dev/null 2>&1 && pwd )
+	directorio=$( cd -P "$( dirname "$bash_source" )" >/dev/null 2>&1 && pwd )
 	local nombre
-	nombre=$(basename "$source")
+	nombre=$(basename "$bash_source")
 	echo "$directorio/$nombre"
 }
-
-# --- Loads setup arguments in /root/.setup_arguments.sh ---
-linux_setup_vars () {
-	source /root/.linux_setup.vars.sh && return 0
-	echo "/root/.linux_setup.vars.sh Not Found !!!"
-	return 1
-}
-
 
 
 # --- GENERA ENCABEZADO PARA LOS ARCHIVOS DE CONFIGURACIÓN ---
@@ -46,7 +38,7 @@ encabezado_stdout () {
 # https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
 # https://devicetests.com/silence-apt-get-install-output
 # https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
-debian_dist_upgrade_install () {
+apt_dist_upgrade_install () {
 	## argumentos: paquetes a instalar luego del dist-upgrade
 	# se comentó la sig línea para evitar el reinicio automático
 	#export NEEDRESTART_MODE=a
