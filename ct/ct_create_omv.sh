@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+sh#!/usr/bin/env bash
 usage () { echo "Usage: ${BASH_SOURCE[0]} ct_id"; }
 
 set -u
@@ -6,11 +6,11 @@ set -u
 vars_path="/root/.vars"
 ct_create_vars_file="$vars_path"/ct_create.vars.sh
 setup_linux_vars_file="$vars_path"/setup_linux.vars.sh
-setup_cloudflare_vars_file="$vars_path"/setup_cloudflare.vars.sh
+#setup_omv_vars_file="$vars_path"/setup_omv.vars.sh
 
 #######################################################################
 #  by panchuz                                                 
-#  creation of cloudflare lxc container
+#  creation of OMV7 lxc privileged container WITH "lxc.cap.drop:"
 #######################################################################
 
 # Sanity check
@@ -28,22 +28,22 @@ source "$ct_create_vars_file" ||return 1
 # lock --rootfs localblock:8 --unprivileged 1 --pool Containers --ignore-unpack-errors --ssh-public-keys /root/.ssh/authorized_keys --ostype ubuntu --password="$ROOTPASS" --start 1
 # abuot rootfs https://forum.proxmox.com/threads/does-proxmox-support-lxc-dir-backend.98486/post-425822
 pct create "$ct_id" "$ct_template" \
-	--hostname cloudflare \
-	--description "cloudflared client" \
-	--tags deb12,admin \
-	--memory 512 \
-	--swap 512 \
-	--cores 1 \
+	--hostname omv \
+	--description "OMV7" \
+	--tags deb12,util \
+	--memory 4096 \
+	--swap 1024 \
+	--cores 2 \
  	--rootfs "$ct_rootfsstorage":$ct_rootfssize,size=$ct_rootfssize,mountoptions="lazytime;noatime" \
 	--net0 name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,type=veth \
 	--onboot 1 \
 	--arch "$ct_architecture" \
-	--protection 1 \
-	--unprivileged 1 \
+	--protection 0 \
+	--unprivileged 0 \
  	--features nesting=1 \
 	--timezone host \
  	--start 0 \
- 	|| return 1
+	--dev0 $ct_omv_dev_passthrough
 	#--hookscript <string> Script that will be exectued during various steps in the containers lifetime.
  	# https://forum.proxmox.com/threads/how-to-use-new-hookscript-feature.53388/post-460707
 	#--ssh-public-keys /root/.ssh/authorized_keys \
@@ -56,6 +56,12 @@ ct_rootfsvolumeid=$(pct config "$ct_id"|grep -oP 'rootfs: \K[^,]*')
 # "plain" drives (just subvolumes, no raw file) need this to work
 # https://forum.proxmox.com/threads/btrfs-filesystem-in-lxc-lxd-container.118803/post-515531
 chmod +rx $(pvesm path "$ct_rootfsvolumeid")
+
+
+# the following line must be written to .conf file directly
+# pct commnad cannot handle it
+# it lets OMV7 read SMART data from passthroughed devices
+echo "lxc.cap.drop =" >>/etc/pve/lxc/$ct_id.conf
 
 pct start "$ct_id" || return 1
 
@@ -75,9 +81,9 @@ pct exec "$ct_id" -- bash -c \
 	"wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_linux.sh &&\
 	source /root/setup_linux.sh"
 
-# cloudflared setup
-pct push "$ct_id" "$setup_cloudflare_vars_file" "$setup_cloudflare_vars_file"
+# OMV7 setup
+#pct push "$ct_id" "$setup_omv_vars_file" "$setup_omv_vars_file"
 
 pct exec "$ct_id" -- bash -c \
-	"wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_cloudflare.sh &&\
-	source /root/setup_cloudflare.sh"
+	"wget -qP /root https://raw.githubusercontent.com/panchuz/setup_linux/$GITHUB_BRANCH/setup_omv.sh &&\
+	source /root/setup_omv.sh"

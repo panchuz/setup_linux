@@ -53,6 +53,7 @@ pct create "$ct_id" "$ct_template" \
 ct_rootfsvolumeid=$(pct config "$ct_id"|grep -oP 'rootfs: \K[^,]*')
 
 # BTRFS Filesystem in LXC/LXD Container
+# "plain" drives (just subvolumes, no raw file) need this to work
 # https://forum.proxmox.com/threads/btrfs-filesystem-in-lxc-lxd-container.118803/post-515531
 chmod +rx $(pvesm path "$ct_rootfsvolumeid")
 
